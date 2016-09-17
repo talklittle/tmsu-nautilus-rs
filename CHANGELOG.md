@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2016-09-17)
+
+* Info provider: Use Mutex and fix Arc misuse that was possibly leading to segfault.
+
 ## 0.2.0 (2016-09-17)
 
 * Ported to Rust. Previous [Python version](https://github.com/talklittle/tmsu-nautilus-python).
