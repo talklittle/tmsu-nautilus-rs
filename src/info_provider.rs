@@ -7,7 +7,7 @@ use std::ffi::{CStr, CString};
 use std::mem;
 use std::path::Path;
 use std::process::Command;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::sync::mpsc::channel;
 use std::thread;
 use url;
@@ -40,15 +40,19 @@ pub extern "C" fn tmsu_extension_update_file_info(provider: *mut NautilusInfoPro
         return NautilusOperationResult::NAUTILUS_OPERATION_COMPLETE;
     }
 
+    let my_handle = Arc::new(Mutex::new(MyOperationHandle { skip_response: false }));
+    let my_handle_local = my_handle.clone();
+    let my_handle_thread = my_handle.clone();
+
     let (tx, rx) = channel();
-    let my_handle = Arc::new(MyOperationHandle { skip_response: false });
-    Box::new(thread::spawn(move || {
-        let (provider, file, update_complete, handle) = rx.recv().unwrap();
-        update_file_info(provider, file, update_complete, handle);
-    }));
+    thread::spawn(move || {
+        let (provider, file, update_complete, handle_ref) = rx.recv().unwrap();
+        update_file_info(provider, file, update_complete, my_handle_thread, handle_ref);
+    });
+
     unsafe {
         let closure_copy = g_closure_ref(update_complete);
-        *handle = mem::transmute(Box::into_raw(Box::new(my_handle)));
+        *handle = mem::transmute(Box::into_raw(Box::new(my_handle_local)));
         tx.send((&mut *provider, &mut *file, &mut *closure_copy, &mut **handle)).unwrap();
     }
 
@@ -58,8 +62,8 @@ pub extern "C" fn tmsu_extension_update_file_info(provider: *mut NautilusInfoPro
 #[no_mangle]
 pub extern "C" fn tmsu_extension_cancel_update(_provider: *mut NautilusInfoProvider, handle: *mut NautilusOperationHandle) {
     unsafe {
-        let ref mut my_handle_arc = *(handle as *mut Arc<MyOperationHandle>);
-        let mut my_handle = Arc::get_mut(my_handle_arc).unwrap();
+        let handle = handle as *mut Arc<Mutex<MyOperationHandle>>;
+        let mut my_handle = (*handle).lock().unwrap();
         my_handle.skip_response = true;
     }
 }
@@ -77,7 +81,11 @@ fn get_path(file: *mut NautilusFileInfo) -> String {
     }
 }
 
-fn update_file_info(provider: &mut NautilusInfoProvider, file: &mut NautilusFileInfo, update_complete: &mut GClosure, handle: &mut NautilusOperationHandle) {
+fn update_file_info(provider: &mut NautilusInfoProvider,
+                    file: &mut NautilusFileInfo,
+                    update_complete: &mut GClosure,
+                    my_handle: Arc<Mutex<MyOperationHandle>>,
+                    handle_ref: &mut NautilusOperationHandle) {
     let path = get_path(file);
 
     let output = Command::new("tmsu")
@@ -99,13 +107,9 @@ fn update_file_info(provider: &mut NautilusInfoProvider, file: &mut NautilusFile
                 None => CString::new("").unwrap().into_raw()
             };
 
-        let handle_ptr = handle as *mut NautilusOperationHandle;
-        let ref mut my_handle_arc = *(handle_ptr as *mut Arc<MyOperationHandle>);
-        let my_handle = Arc::get_mut(my_handle_arc).unwrap();
-
-        if !my_handle.skip_response {
+        if !my_handle.lock().unwrap().skip_response {
             nautilus_file_info_add_string_attribute(file, attr_name, attr_value);
-            nautilus_info_provider_update_complete_invoke(update_complete, provider, handle, NautilusOperationResult::NAUTILUS_OPERATION_COMPLETE);
+            nautilus_info_provider_update_complete_invoke(update_complete, provider, handle_ref, NautilusOperationResult::NAUTILUS_OPERATION_COMPLETE);
         }
 
         // deallocate CStrings
