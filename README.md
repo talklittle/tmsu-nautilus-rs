@@ -29,7 +29,7 @@ Kill and restart Nautilus:
 
 ### (Optional) Reduce shared library file size
 
-See issue #7
+See [issue #7](https://github.com/talklittle/tmsu-nautilus-rs/issues/7)
 
     cargo rustc --release -- -C prefer-dynamic
     strip target/release/libtmsu_nautilus.so
