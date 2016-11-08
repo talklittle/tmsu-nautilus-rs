@@ -5,12 +5,13 @@ extern crate gobject_sys as gobject_ffi;
 extern crate gtk_sys as gtk_ffi;
 extern crate libc;
 
+extern crate nautilus_extension;
 #[macro_use(nautilus_module)]
 extern crate nautilus_extension_sys;
 
 extern crate url;
 
-pub mod nautilus_extension;
+pub mod tmsu_nautilus;
 pub mod nautilus_ffi;
 pub mod column_provider;
 pub mod info_provider;
