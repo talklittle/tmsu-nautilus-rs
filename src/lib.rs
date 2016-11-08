@@ -4,6 +4,10 @@ extern crate glib_sys as glib_ffi;
 extern crate gobject_sys as gobject_ffi;
 extern crate gtk_sys as gtk_ffi;
 extern crate libc;
+
+#[macro_use(nautilus_module)]
+extern crate nautilus_extension_sys;
+
 extern crate url;
 
 pub mod nautilus_extension;

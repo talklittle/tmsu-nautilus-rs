@@ -12,8 +12,7 @@ use column_provider;
 use info_provider;
 use menu_provider;
 
-static mut module_type: GType = 0;
-static mut module_type_list: [GType; 1] = [0];
+nautilus_module!(register_type);
 
 const VALUE_TABLE: GTypeValueTable = GTypeValueTable {
     value_init: None,
@@ -29,30 +28,6 @@ const VALUE_TABLE: GTypeValueTable = GTypeValueTable {
 #[repr(C)]
 struct TmsuNautilusExtensionClass {
     _parent_slot: GObjectClass
-}
-
-#[no_mangle]
-pub extern "C" fn nautilus_module_initialize(module: *mut GTypeModule) {
-    println!("Initializing TMSU Nautilus Extension");
-
-    register_type(module);
-    unsafe {
-        module_type_list[0] = module_type;
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn nautilus_module_list_types(types: *mut *const GType, num_types: *mut c_int) {
-    unsafe {
-        *types = module_type_list.as_ptr();
-        *num_types = module_type_list.len() as c_int;
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn nautilus_module_shutdown() {
-    println!("Shutting down TMSU Nautilus Extension");
-    // Any module-specific shutdown code
 }
 
 fn register_type(module: *mut GTypeModule) {
