@@ -1,7 +1,4 @@
 use nautilus_extension::{FileInfo, InfoProvider};
-use nautilus_ffi::NautilusFileInfo;
-use nautilus_ffi::{nautilus_file_info_get_uri, nautilus_file_info_get_uri_scheme};
-use std::ffi::CStr;
 use std::path::Path;
 use std::process::Command;
 use url;
@@ -12,12 +9,11 @@ pub struct TmsuInfoProvider {
 
 impl InfoProvider for TmsuInfoProvider {
     fn should_update_file_info(&self, file_info: &mut FileInfo) -> bool {
-        "file" == get_uri_scheme(file_info.raw_file_info)
+        "file" == file_info.get_uri_scheme()
     }
 
     fn update_file_info(&self, file_info: &mut FileInfo) {
-        let ref mut file = file_info.raw_file_info;
-        let path = get_path(*file as *mut NautilusFileInfo);
+        let path = get_path(file_info);
 
         let output = Command::new("tmsu")
                              .arg("tags")
@@ -41,15 +37,7 @@ impl InfoProvider for TmsuInfoProvider {
     }
 }
 
-fn get_uri_scheme(file: *mut NautilusFileInfo) -> String {
-    unsafe {
-        CStr::from_ptr(nautilus_file_info_get_uri_scheme(file)).to_string_lossy().into_owned()
-    }
-}
-
-fn get_path(file: *mut NautilusFileInfo) -> String {
-    unsafe {
-        let uri = CStr::from_ptr(nautilus_file_info_get_uri(file)).to_str().unwrap();
-        url::percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned()
-    }
+fn get_path(file_info: &mut FileInfo) -> String {
+    let uri = file_info.get_uri();
+    url::percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned()
 }
