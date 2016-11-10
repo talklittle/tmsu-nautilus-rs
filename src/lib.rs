@@ -7,12 +7,11 @@ extern crate libc;
 
 extern crate nautilus_extension;
 #[macro_use(nautilus_module)]
-extern crate nautilus_extension_sys;
+extern crate nautilus_extension_sys as nautilus_ffi;
 
 extern crate url;
 
 pub mod tmsu_nautilus;
-pub mod nautilus_ffi;
 pub mod column_provider;
 pub mod info_provider;
 pub mod menu_provider;
