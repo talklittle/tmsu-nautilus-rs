@@ -1,5 +1,5 @@
 use gdk_ffi::{GdkEvent, GdkWindowTypeHint};
-use glib_ffi::{GList, g_list_append, g_list_length, g_list_nth_data, gboolean, gpointer};
+use glib_ffi::{GList, gboolean, gpointer};
 use gobject_ffi::{GConnectFlags, GObject, g_signal_connect_data};
 use gtk_ffi::{GtkBox, GtkButton, GtkContainer, GtkEntry, GtkOrientation, GtkWidget, GtkWindow, GtkWindowType};
 use gtk_ffi::{gtk_init, gtk_main, gtk_main_quit};
@@ -11,9 +11,7 @@ use gtk_ffi::gtk_label_new;
 use gtk_ffi::{gtk_widget_set_size_request, gtk_widget_show_all};
 use gtk_ffi::{gtk_window_close, gtk_window_new, gtk_window_set_title, gtk_window_set_type_hint};
 use libc::{c_char, c_void};
-use nautilus_ffi::{NautilusFileInfo, NautilusMenuProviderIface};
-use nautilus_ffi::{nautilus_file_info_get_uri, nautilus_file_info_get_uri_scheme, nautilus_file_info_invalidate_extension_info, nautilus_file_info_list_copy};
-use nautilus_ffi::{nautilus_menu_new, nautilus_menu_append_item, nautilus_menu_item_new, nautilus_menu_item_set_submenu};
+use nautilus_extension::{FileInfo, Menu, MenuItem, MenuProvider};
 use std::ffi::{CStr, CString};
 use std::mem;
 use std::path::Path;
@@ -21,72 +19,30 @@ use std::process::Command;
 use std::ptr;
 use url;
 
-#[no_mangle]
-pub unsafe extern "C" fn tmsu_extension_menu_provider_iface_init(iface: gpointer, _: gpointer) {
-    tmsu_extension_menu_provider_iface_struct(iface);
+pub struct TmsuMenuProvider {
+
 }
 
-fn tmsu_extension_menu_provider_iface_struct(iface: gpointer) {
-    let iface_struct = iface as *mut NautilusMenuProviderIface;
-    unsafe {
-        (*iface_struct).get_file_items = Some(tmsu_extension_get_file_items);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn tmsu_extension_get_file_items(_provider: *mut c_void, _window: *mut GtkWidget, files: *mut GList) -> *mut GList {
-    if files.is_null() {
-        return ptr::null_mut() as *mut GList;
-    }
-
-    let name = CString::new("TmsuNautilusExtension::TMSU").unwrap().into_raw();
-    let label = CString::new("TMSU").unwrap().into_raw();
-    let tip = CString::new("TMSU tags").unwrap().into_raw();
-    let icon = ptr::null();
-
-    let add_tag_name = CString::new("TmsuNautilusExtension::Add_Tag").unwrap().into_raw();
-    let add_tag_label = CString::new("Add tags\u{2026}").unwrap().into_raw();
-    let add_tag_tip = CString::new("Add tags\u{2026}").unwrap().into_raw();
-    let add_tag_icon = ptr::null();
-
-    let activate_name = CString::new("activate").unwrap().into_raw();
-
-    unsafe {
-        let top_menuitem = nautilus_menu_item_new(name, label, tip, icon);
-        let submenu = nautilus_menu_new();
-        nautilus_menu_item_set_submenu(top_menuitem, submenu);
-
-        let add_tag_menuitem = nautilus_menu_item_new(add_tag_name, add_tag_label, add_tag_tip, add_tag_icon);
-        g_signal_connect_data(
-            add_tag_menuitem as *mut GObject,
-            activate_name,
-            Some(mem::transmute(add_tag_activate_cb as *mut c_void)),
-            nautilus_file_info_list_copy(files) as *mut c_void,
-            None,
-            GConnectFlags::empty()
+impl MenuProvider for TmsuMenuProvider {
+    fn get_file_items<'a>(&self, _window: *mut GtkWidget, _files: &Vec<FileInfo<'a>>) -> Vec<MenuItem> {
+        let mut top_menuitem = MenuItem::new(
+            "TmsuNautilusExtension::TMSU".to_string(), "TMSU".to_string(), "TMSU tags".to_string(), None
         );
-        nautilus_menu_append_item(submenu, add_tag_menuitem);
 
-        let mut items: *mut GList = ptr::null_mut();
-        items = g_list_append(items, top_menuitem as *mut c_void);
+        let mut add_tag_menuitem = MenuItem::new(
+            "TmsuNautilusExtension::Add_Tag".to_string(), "Add tags\u{2026}".to_string(), "Add tags\u{2026}".to_string(), None
+        );
+        add_tag_menuitem.set_activate_cb(add_tag_activate_cb);
 
-        // deallocate CStrings
-        CString::from_raw(name);
-        CString::from_raw(label);
-        CString::from_raw(tip);
-        CString::from_raw(add_tag_name);
-        CString::from_raw(add_tag_label);
-        CString::from_raw(add_tag_tip);
-        CString::from_raw(activate_name);
+        let submenu = Menu::new(vec![add_tag_menuitem]);
 
-        return items;
+        top_menuitem.set_submenu(submenu);
+
+        vec![top_menuitem]
     }
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn add_tag_activate_cb(_nautilusmenuitem: *mut GObject, user_data: gpointer) {
-    show_add_tag_window(user_data);
-}
+nautilus_menu_item_activate_cb!(add_tag_activate_cb, show_add_tag_window);
 
 #[no_mangle]
 pub unsafe extern "C" fn on_delete_window_cb(_window: *mut GtkWidget, _event: *mut GdkEvent, user_data: gpointer) -> gboolean {
@@ -112,10 +68,10 @@ pub unsafe extern "C" fn on_button_clicked_cb(_button: *mut GtkWidget, user_data
 }
 
 #[repr(C)]
-struct AddTagsWindowData {
+struct AddTagsWindowData<'a> {
     window: *mut GtkWidget,
     entry: *mut GtkEntry,
-    files: *mut GList,
+    files: Vec<FileInfo<'a>>,
     raw_c_strings: Vec<*mut c_char>
 }
 
@@ -126,15 +82,13 @@ fn init_gtk() {
     }
 }
 
-fn show_add_tag_window(user_data: gpointer) {
+fn show_add_tag_window(files: Vec<FileInfo>) {
     let button_text = CString::new("Add").unwrap().into_raw();
     let activate_name = CString::new("activate").unwrap().into_raw();
     let clicked_name = CString::new("clicked").unwrap().into_raw();
     let delete_event_name = CString::new("delete-event").unwrap().into_raw();
     let destroy_name = CString::new("destroy").unwrap().into_raw();
     let title = CString::new("TMSU").unwrap().into_raw();
-
-    let files = user_data as *mut GList;
 
     // required before using Gtk
     init_gtk();
@@ -153,7 +107,7 @@ fn show_add_tag_window(user_data: gpointer) {
         let vbox = gtk_box_new(GtkOrientation::Vertical, 6);
         gtk_container_add(window as *mut GtkContainer, vbox);
 
-        let files_count = g_list_length(files);
+        let files_count = files.len();
         let prompt_text = format!("Add (space-separated) tags to {} file{}", files_count, if files_count == 1 { "" } else { "s" });
         let prompt_text_c = CString::new(prompt_text).unwrap().into_raw();
 
@@ -235,10 +189,11 @@ fn add_tags(user_data: *mut c_void) {
     unsafe {
         // don't use Box::from_raw; keep raw pointer under Glib control until Gtk window destroyed
         let add_tags_window_ptr: *mut AddTagsWindowData = user_data as *mut AddTagsWindowData;
-        let ref add_tags_window = *add_tags_window_ptr;
+        let ref mut add_tags_window = *add_tags_window_ptr;
 
         let entry_text = CStr::from_ptr(gtk_entry_get_text(add_tags_window.entry)).to_str().unwrap();
-        let filenames = filenames(add_tags_window.files);
+        let ref mut file_infos = add_tags_window.files;
+        let filenames = filenames(file_infos);
 
         for tag in entry_text.split_whitespace() {
             Command::new("tmsu")
@@ -250,38 +205,34 @@ fn add_tags(user_data: *mut c_void) {
                     .expect("failed to tag files");
         }
 
-        invalidate_file_infos(add_tags_window.files);
+        invalidate_file_infos(file_infos);
 
         gtk_window_close(add_tags_window.window as *mut GtkWindow);
     }
 }
 
-fn filenames(files: *mut GList) -> Vec<String> {
+fn filenames(files: &mut Vec<FileInfo>) -> Vec<String> {
     let mut filenames = vec![];
-    unsafe {
-        let length = g_list_length(files);
-        for i in 0..length {
-            let file = g_list_nth_data(files, i) as *mut NautilusFileInfo;
-            let uri_scheme = CStr::from_ptr(nautilus_file_info_get_uri_scheme(file)).to_str().unwrap();
-            if uri_scheme != "file" {
-                continue;
-            }
-
-            let uri = CStr::from_ptr(nautilus_file_info_get_uri(file)).to_str().unwrap();
-            let path = url::percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned();
-            filenames.push(path);
+    let length = files.len();
+    for i in 0..length {
+        let ref mut file_info = files[i];
+        let uri_scheme = file_info.get_uri_scheme();
+        if uri_scheme != "file" {
+            continue;
         }
+
+        let uri = file_info.get_uri();
+        let path = url::percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned();
+        filenames.push(path);
     }
     filenames
 }
 
-fn invalidate_file_infos(files: *mut GList) {
-    unsafe {
-        let length = g_list_length(files);
-        for i in 0..length {
-            let file = g_list_nth_data(files, i) as *mut NautilusFileInfo;
-            nautilus_file_info_invalidate_extension_info(file);
-        }
+fn invalidate_file_infos(files: &mut Vec<FileInfo>) {
+    let length = files.len();
+    for i in 0..length {
+        let ref mut file_info = files[i];
+        file_info.invalidate_extension_info();
     }
 }
 
