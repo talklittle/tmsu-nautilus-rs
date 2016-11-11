@@ -7,9 +7,11 @@ use column_provider;
 use info_provider;
 use menu_provider;
 
-nautilus_module!(register_type);
+nautilus_module!(init);
 
-fn register_type(module: *mut GTypeModule) -> GType {
+fn init(module: *mut GTypeModule) -> GType {
+    println!("Initializing TMSU Nautilus");
+
     NautilusModule::new(module, "TmsuNautilusExtension")
         .add_column_provider(column_provider::TmsuColumnProvider {})
         .add_info_provider(info_provider::TmsuInfoProvider {})
