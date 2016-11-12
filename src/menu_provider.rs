@@ -24,7 +24,7 @@ pub struct TmsuMenuProvider {
 }
 
 impl MenuProvider for TmsuMenuProvider {
-    fn get_file_items<'a>(&self, _window: *mut GtkWidget, _files: &Vec<FileInfo<'a>>) -> Vec<MenuItem> {
+    fn get_file_items(&self, _window: *mut GtkWidget, _files: &Vec<FileInfo>) -> Vec<MenuItem> {
         let mut top_menuitem = MenuItem::new(
             "TmsuNautilusExtension::TMSU".to_string(), "TMSU".to_string(), "TMSU tags".to_string(), None
         );
@@ -68,10 +68,10 @@ pub unsafe extern "C" fn on_button_clicked_cb(_button: *mut GtkWidget, user_data
 }
 
 #[repr(C)]
-struct AddTagsWindowData<'a> {
+struct AddTagsWindowData {
     window: *mut GtkWidget,
     entry: *mut GtkEntry,
-    files: Vec<FileInfo<'a>>,
+    files: Vec<FileInfo>,
     raw_c_strings: Vec<*mut c_char>
 }
 
@@ -211,11 +211,11 @@ fn add_tags(user_data: *mut c_void) {
     }
 }
 
-fn filenames(files: &mut Vec<FileInfo>) -> Vec<String> {
+fn filenames(files: &Vec<FileInfo>) -> Vec<String> {
     let mut filenames = vec![];
     let length = files.len();
     for i in 0..length {
-        let ref mut file_info = files[i];
+        let ref file_info = files[i];
         let uri_scheme = file_info.get_uri_scheme();
         if uri_scheme != "file" {
             continue;
@@ -228,10 +228,10 @@ fn filenames(files: &mut Vec<FileInfo>) -> Vec<String> {
     filenames
 }
 
-fn invalidate_file_infos(files: &mut Vec<FileInfo>) {
+fn invalidate_file_infos(files: &Vec<FileInfo>) {
     let length = files.len();
     for i in 0..length {
-        let ref mut file_info = files[i];
+        let ref file_info = files[i];
         file_info.invalidate_extension_info();
     }
 }
