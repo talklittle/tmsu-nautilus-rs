@@ -12,6 +12,7 @@ pub mod tmsu_nautilus;
 pub mod column_provider;
 pub mod info_provider;
 pub mod menu_provider;
+pub mod property_page_provider;
 
 #[cfg(test)]
 mod tests {
