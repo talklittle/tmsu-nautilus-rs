@@ -183,8 +183,6 @@ fn add_tags(user_data: *mut c_void) {
                     .expect("failed to tag files");
         }
 
-        invalidate_file_infos(file_infos);
-
         gtk_window_close(add_tags_window.window as *mut GtkWindow);
     }
 }
@@ -206,16 +204,18 @@ fn filenames(files: &Vec<FileInfo>) -> Vec<String> {
     filenames
 }
 
-fn invalidate_file_infos(files: &Vec<FileInfo>) {
+fn destroy_window_data(user_data: *mut c_void) {
+    unsafe {
+        let add_tags_window: Box<AddTagsWindowData> = Box::from_raw(mem::transmute(user_data));
+        let file_infos = add_tags_window.files;
+        invalidate_file_infos(file_infos);
+    }
+}
+
+fn invalidate_file_infos(files: Vec<FileInfo>) {
     let length = files.len();
     for i in 0..length {
         let ref file_info = files[i];
         file_info.invalidate_extension_info();
-    }
-}
-
-fn destroy_window_data(user_data: *mut c_void) {
-    unsafe {
-        Box::from_raw(user_data);
     }
 }
