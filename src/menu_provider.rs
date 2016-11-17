@@ -12,7 +12,7 @@ use gtk_ffi::{gtk_widget_set_size_request, gtk_widget_show_all};
 use gtk_ffi::{gtk_window_close, gtk_window_new, gtk_window_set_title, gtk_window_set_type_hint};
 use libc::{c_char, c_void};
 use nautilus_extension::{FileInfo, Menu, MenuItem, MenuProvider};
-use std::ffi::{CStr, CString};
+use std::ffi::CStr;
 use std::mem;
 use std::path::Path;
 use std::process::Command;
@@ -72,7 +72,6 @@ struct AddTagsWindowData {
     window: *mut GtkWidget,
     entry: *mut GtkEntry,
     files: Vec<FileInfo>,
-    raw_c_strings: Vec<*mut c_char>
 }
 
 fn init_gtk() {
@@ -83,13 +82,6 @@ fn init_gtk() {
 }
 
 fn show_add_tag_window(files: Vec<FileInfo>) {
-    let button_text = CString::new("Add").unwrap().into_raw();
-    let activate_name = CString::new("activate").unwrap().into_raw();
-    let clicked_name = CString::new("clicked").unwrap().into_raw();
-    let delete_event_name = CString::new("delete-event").unwrap().into_raw();
-    let destroy_name = CString::new("destroy").unwrap().into_raw();
-    let title = CString::new("TMSU").unwrap().into_raw();
-
     // required before using Gtk
     init_gtk();
 
@@ -97,7 +89,7 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
         // create window
 
         let window = gtk_window_new(GtkWindowType::Toplevel);
-        gtk_window_set_title(window as *mut GtkWindow, title);
+        gtk_window_set_title(window as *mut GtkWindow, "TMSU\0".as_ptr() as *const c_char);
         gtk_widget_set_size_request(window, 200, 100);
         gtk_container_set_border_width(window as *mut GtkContainer, 10);
         gtk_window_set_type_hint(window as *mut GtkWindow, GdkWindowTypeHint::Dialog);
@@ -108,43 +100,29 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
         gtk_container_add(window as *mut GtkContainer, vbox);
 
         let files_count = files.len();
-        let prompt_text = format!("Add (space-separated) tags to {} file{}", files_count, if files_count == 1 { "" } else { "s" });
-        let prompt_text_c = CString::new(prompt_text).unwrap().into_raw();
+        let prompt_text = format!("Add (space-separated) tags to {} file{}\0", files_count, if files_count == 1 { "" } else { "s" });
 
-        let prompt_label = gtk_label_new(prompt_text_c);
+        let prompt_label = gtk_label_new(prompt_text.as_ptr() as *const c_char);
         gtk_box_pack_start(vbox as *mut GtkBox, prompt_label, true as gboolean, true as gboolean, 0);
 
         let entry = gtk_entry_new();
         gtk_box_pack_start(vbox as *mut GtkBox, entry, true as gboolean, true as gboolean, 0);
 
         let button = gtk_button_new();
-        gtk_button_set_label(button as *mut GtkButton, button_text);
+        gtk_button_set_label(button as *mut GtkButton, "Add\0".as_ptr() as *const c_char);
         gtk_box_pack_start(vbox as *mut GtkBox, button, true as gboolean, true as gboolean, 0);
-
-        // keep track of CStrings to deallocate
-
-        let raw_c_strings = vec![
-            activate_name,
-            button_text,
-            clicked_name,
-            delete_event_name,
-            destroy_name,
-            prompt_text_c,
-            title
-        ];
 
         let add_tags_window_data = Box::new(AddTagsWindowData {
             window: window,
             entry: entry as *mut GtkEntry,
             files: files,
-            raw_c_strings: raw_c_strings
         });
         let add_tags_window_data_raw = Box::into_raw(mem::transmute(add_tags_window_data));
 
         // hit Enter in text entry box
         g_signal_connect_data(
             entry as *mut GObject,
-            activate_name,
+            "activate\0".as_ptr() as *const c_char,
             Some(mem::transmute(on_entry_activated_cb as *mut c_void)),
             add_tags_window_data_raw,
             None,
@@ -154,7 +132,7 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
         // click button
         g_signal_connect_data(
             button as *mut GObject,
-            clicked_name,
+            "clicked\0".as_ptr() as *const c_char,
             Some(mem::transmute(on_button_clicked_cb as *mut c_void)),
             add_tags_window_data_raw,
             None,
@@ -164,7 +142,7 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
         // close window
         g_signal_connect_data(
             window as *mut GObject,
-            delete_event_name,
+            "delete-event\0".as_ptr() as *const c_char,
             Some(mem::transmute(on_delete_window_cb as *mut c_void)),
             add_tags_window_data_raw,
             None,
@@ -172,7 +150,7 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
         );
         g_signal_connect_data(
             window as *mut GObject,
-            destroy_name,
+            "destroy\0".as_ptr() as *const c_char,
             Some(mem::transmute(on_destroy_window_cb as *mut c_void)),
             ptr::null_mut(),
             None,
@@ -238,16 +216,6 @@ fn invalidate_file_infos(files: &Vec<FileInfo>) {
 
 fn destroy_window_data(user_data: *mut c_void) {
     unsafe {
-        let boxed_add_tags_window: Box<AddTagsWindowData> = mem::transmute(Box::from_raw(user_data));
-        let add_tags_window = *boxed_add_tags_window;
-        deallocate_window_strings(&add_tags_window);
-    }
-}
-
-fn deallocate_window_strings(add_tags_window: &AddTagsWindowData) {
-    for raw_c_string in &add_tags_window.raw_c_strings {
-        unsafe {
-            CString::from_raw(*raw_c_string);
-        }
+        Box::from_raw(user_data);
     }
 }
