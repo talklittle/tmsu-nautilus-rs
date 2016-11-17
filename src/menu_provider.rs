@@ -1,5 +1,5 @@
 use gdk_ffi::{GdkEvent, GdkWindowTypeHint};
-use glib_ffi::{gboolean, gpointer};
+use glib_ffi::{GFALSE, gboolean, gpointer};
 use gobject_ffi::{GConnectFlags, GObject, g_signal_connect_data};
 use gtk_ffi::{GtkBox, GtkButton, GtkContainer, GtkEntry, GtkOrientation, GtkWidget, GtkWindow, GtkWindowType};
 use gtk_ffi::{gtk_init, gtk_main, gtk_main_quit};
@@ -49,7 +49,7 @@ pub unsafe extern "C" fn on_delete_window_cb(_window: *mut GtkWidget, _event: *m
     destroy_window_data(user_data);
 
     // send "destroy" signal
-    false as gboolean
+    GFALSE
 }
 
 #[no_mangle]
