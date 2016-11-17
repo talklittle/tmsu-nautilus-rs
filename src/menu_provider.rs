@@ -37,7 +37,7 @@ impl MenuProvider for TmsuMenuProvider {
 nautilus_menu_item_activate_cb!(add_tag_activate_cb, show_add_tag_window);
 
 fn show_add_tag_window(files: Vec<FileInfo>) {
-    gtk::init().unwrap();
+    init_gtk();
 
     let window = gtk::Window::new(gtk::WindowType::Toplevel);
     window.set_title("TMSU");
