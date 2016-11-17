@@ -4,9 +4,11 @@ use gobject_ffi::GObject;
 use gtk;
 use gtk::prelude::*;
 use gtk_ffi::GtkWidget;
+use gtk_ffi::gtk_init;
 use nautilus_extension::{FileInfo, Menu, MenuItem, MenuProvider};
 use std::path::Path;
 use std::process::Command;
+use std::ptr;
 use url;
 
 pub struct TmsuMenuProvider {
@@ -14,7 +16,7 @@ pub struct TmsuMenuProvider {
 }
 
 impl MenuProvider for TmsuMenuProvider {
-    fn get_file_items<'a>(&self, _window: *mut GtkWidget, _files: &Vec<FileInfo>) -> Vec<MenuItem> {
+    fn get_file_items(&self, _window: *mut GtkWidget, _files: &Vec<FileInfo>) -> Vec<MenuItem> {
         let mut top_menuitem = MenuItem::new(
             "TmsuNautilusExtension::TMSU".to_string(), "TMSU".to_string(), "TMSU tags".to_string(), None
         );
@@ -71,13 +73,22 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
         add_tags(&entry_clone, &files_clone, &window_clone);
     });
 
-    window.connect_delete_event(|_, _| {
+    let files_clone = files.clone();
+    window.connect_delete_event(move |_, _| {
+        invalidate_file_infos(&files_clone);
         gtk::main_quit();
         Inhibit(false)
     });
 
     window.show_all();
     gtk::main();
+}
+
+fn init_gtk() {
+    let mut argc = 0;
+    unsafe {
+        gtk_init(&mut argc, ptr::null_mut());
+    }
 }
 
 fn add_tags(entry: &gtk::Entry, file_infos: &Vec<FileInfo>, window: &gtk::Window) {
@@ -93,8 +104,6 @@ fn add_tags(entry: &gtk::Entry, file_infos: &Vec<FileInfo>, window: &gtk::Window
                 .output()
                 .expect("failed to tag files");
     }
-
-    invalidate_file_infos(file_infos);
 
     window.close();
 }
