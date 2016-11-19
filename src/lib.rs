@@ -8,11 +8,12 @@ extern crate libc;
 extern crate nautilus_extension;
 extern crate url;
 
-pub mod tmsu_nautilus;
 pub mod column_provider;
 pub mod info_provider;
 pub mod menu_provider;
 pub mod property_page_provider;
+mod tmsu_commands;
+pub mod tmsu_nautilus;
 
 #[cfg(test)]
 mod tests {
