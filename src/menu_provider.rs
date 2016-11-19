@@ -1,5 +1,5 @@
 use gdk_ffi::{GdkEvent, GdkWindowTypeHint};
-use glib_ffi::{GFALSE, gboolean, gpointer};
+use glib_ffi::{GFALSE, GTRUE, gboolean, gpointer};
 use gobject_ffi::{GConnectFlags, GObject, g_signal_connect_data};
 use gtk_ffi::{GtkBox, GtkButton, GtkContainer, GtkEntry, GtkOrientation, GtkWidget, GtkWindow, GtkWindowType};
 use gtk_ffi::{gtk_init, gtk_main, gtk_main_quit};
@@ -103,14 +103,14 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
         let prompt_text = format!("Add (space-separated) tags to {} file{}\0", files_count, if files_count == 1 { "" } else { "s" });
 
         let prompt_label = gtk_label_new(prompt_text.as_ptr() as *const c_char);
-        gtk_box_pack_start(vbox as *mut GtkBox, prompt_label, true as gboolean, true as gboolean, 0);
+        gtk_box_pack_start(vbox as *mut GtkBox, prompt_label, GTRUE, GTRUE, 0);
 
         let entry = gtk_entry_new();
-        gtk_box_pack_start(vbox as *mut GtkBox, entry, true as gboolean, true as gboolean, 0);
+        gtk_box_pack_start(vbox as *mut GtkBox, entry, GTRUE, GTRUE, 0);
 
         let button = gtk_button_new();
         gtk_button_set_label(button as *mut GtkButton, "Add\0".as_ptr() as *const c_char);
-        gtk_box_pack_start(vbox as *mut GtkBox, button, true as gboolean, true as gboolean, 0);
+        gtk_box_pack_start(vbox as *mut GtkBox, button, GTRUE, GTRUE, 0);
 
         let add_tags_window_data = Box::new(AddTagsWindowData {
             window: window,
