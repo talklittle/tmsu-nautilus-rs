@@ -23,11 +23,13 @@ pub fn list_box_new(files: &Vec<FileInfo>) -> *mut GtkWidget {
                 None => tmsu_commands::tags(&get_path(&file)),  // TODO query the tags now
             };
 
-        for tag in tags_string.split(" ") {
-            println!("tag is: {}", tag);
-            let row = list_box_row(tag, &file);
-            unsafe {
-                gtk_container_add(list_box as *mut GtkContainer, row);
+        if tags_string.len() > 0 {
+            for tag in tags_string.split(" ") {
+                println!("tag is: {}", tag);
+                let row = list_box_row(tag, &file);
+                unsafe {
+                    gtk_container_add(list_box as *mut GtkContainer, row);
+                }
             }
         }
     }
