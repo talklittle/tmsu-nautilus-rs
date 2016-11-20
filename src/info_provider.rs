@@ -13,10 +13,10 @@ impl InfoProvider for TmsuInfoProvider {
 
     fn update_file_info(&self, file_info: &mut FileInfo) {
         let path = get_path(file_info);
-        let attr_name = "tmsu_tags".to_string();
+        let attr_name = "tmsu_tags";
         let attr_value = tmsu_commands::tags(&path);
 
-        file_info.attributes.insert(attr_name, attr_value);
+        file_info.add_attribute(attr_name, &attr_value);
     }
 }
 

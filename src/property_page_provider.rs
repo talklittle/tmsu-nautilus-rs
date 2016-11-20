@@ -21,11 +21,7 @@ impl PropertyPageProvider for TmsuPropertyPageProvider {
         list.show_all();
 
         vec![
-            PropertyPage {
-                name: "TMSU tags".to_string(),
-                raw_label: label.to_glib_none().0,
-                raw_page: list.to_glib_none().0,
-            }
+            PropertyPage::new("TMSU tags", label.to_glib_none().0, list.to_glib_none().0)
         ]
     }
 }
