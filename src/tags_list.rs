@@ -1,19 +1,22 @@
 // GTK List Box widget
 
 use glib_ffi::{GFALSE, GTRUE};
-use gtk_ffi::{GtkAlign, GtkBox, GtkButton, GtkContainer, GtkOrientation, GtkWidget};
+use gtk_ffi::{GtkAlign, GtkBox, GtkButton, GtkContainer, GtkOrientation, GtkPolicyType, GtkScrolledWindow, GtkWidget};
 use gtk_ffi::{gtk_box_new, gtk_box_pack_end, gtk_box_pack_start};
 use gtk_ffi::{gtk_button_new, gtk_button_set_label};
 use gtk_ffi::gtk_container_add;
 use gtk_ffi::gtk_label_new;
 use gtk_ffi::gtk_list_box_new;
+use gtk_ffi::{gtk_scrolled_window_new, gtk_scrolled_window_set_policy};
 use gtk_ffi::gtk_widget_set_halign;
 use libc::c_char;
 use nautilus_extension::FileInfo;
+use std::ptr;
 use tmsu_commands;
 use url;
 
-pub fn list_box_new(files: &Vec<FileInfo>) -> *mut GtkWidget {
+pub fn new_widget(files: &Vec<FileInfo>) -> *mut GtkWidget {
+    let scrolled_window = unsafe { gtk_scrolled_window_new(ptr::null_mut(), ptr::null_mut()) };
     let list_box = unsafe { gtk_list_box_new() };
 
     for file in files {
@@ -34,7 +37,12 @@ pub fn list_box_new(files: &Vec<FileInfo>) -> *mut GtkWidget {
         }
     }
 
-    list_box
+    unsafe {
+        gtk_container_add(scrolled_window as *mut GtkContainer, list_box);
+        gtk_scrolled_window_set_policy(scrolled_window as *mut GtkScrolledWindow, GtkPolicyType::Automatic, GtkPolicyType::Always);
+    }
+
+    scrolled_window
 }
 
 fn list_box_row(tag: &str, file: &FileInfo) -> *mut GtkWidget {

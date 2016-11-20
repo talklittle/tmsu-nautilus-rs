@@ -15,7 +15,7 @@ impl PropertyPageProvider for TmsuPropertyPageProvider {
         let label_text_c = CString::new(label_text).unwrap().into_raw();
         let label = unsafe { gtk_label_new(label_text_c) };
 
-        let list = tags_list::list_box_new(files);
+        let list = tags_list::new_widget(files);
 
         unsafe {
             gtk_widget_show_all(list);
