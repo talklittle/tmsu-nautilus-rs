@@ -1,7 +1,7 @@
-use gtk_ffi::gtk_label_new;
-use gtk_ffi::gtk_widget_show_all;
+use glib::translate::*;
+use gtk;
+use gtk::prelude::*;
 use nautilus_extension::{FileInfo, PropertyPage, PropertyPageProvider};
-use std::ffi::CString;
 use tags_list;
 
 pub struct TmsuPropertyPageProvider {
@@ -12,20 +12,17 @@ impl PropertyPageProvider for TmsuPropertyPageProvider {
     fn get_pages(&self, files: &Vec<FileInfo>) -> Vec<PropertyPage> {
 
         let label_text = "TMSU tags";
-        let label_text_c = CString::new(label_text).unwrap().into_raw();
-        let label = unsafe { gtk_label_new(label_text_c) };
+        let label = gtk::Label::new(Some(label_text));
 
         let list = tags_list::new_widget(files);
 
-        unsafe {
-            gtk_widget_show_all(list);
-        }
+        list.show_all();
 
         vec![
             PropertyPage {
                 name: "TMSU tags".to_string(),
-                raw_label: label,
-                raw_page: list,
+                raw_label: label.to_glib_none().0,
+                raw_page: list.to_glib_none().0,
             }
         ]
     }

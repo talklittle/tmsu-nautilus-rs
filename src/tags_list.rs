@@ -1,14 +1,12 @@
 // GTK List Box widget
 
-use glib::translate::*;
 use gtk;
 use gtk::prelude::*;
-use gtk_ffi::GtkWidget;
 use nautilus_extension::FileInfo;
 use tmsu_commands;
 use url;
 
-pub fn new_widget(files: &Vec<FileInfo>) -> *mut GtkWidget {
+pub fn new_widget(files: &Vec<FileInfo>) -> gtk::Widget {
     let scrolled_window = gtk::ScrolledWindow::new(None, None);
     scrolled_window.set_policy(gtk::PolicyType::Automatic, gtk::PolicyType::Always);
 
@@ -19,7 +17,7 @@ pub fn new_widget(files: &Vec<FileInfo>) -> *mut GtkWidget {
 
     scrolled_window.add(&list_box);
 
-    scrolled_window.to_glib_none().0
+    scrolled_window.upcast::<gtk::Widget>()
 }
 
 fn add_tag_rows_from_file(list_box: &mut gtk::ListBox, file: &FileInfo) {
