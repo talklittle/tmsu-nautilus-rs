@@ -4,11 +4,10 @@ use gobject_ffi::GObject;
 use gtk;
 use gtk::prelude::*;
 use gtk_ffi::GtkWidget;
-use gtk_ffi::gtk_init;
+use gtk_helpers;
 use nautilus_extension::{FileInfo, Menu, MenuItem, MenuProvider};
 use std::path::Path;
 use std::process::Command;
-use std::ptr;
 use url;
 
 pub struct TmsuMenuProvider {
@@ -37,7 +36,7 @@ impl MenuProvider for TmsuMenuProvider {
 nautilus_menu_item_activate_cb!(add_tag_activate_cb, show_add_tag_window);
 
 fn show_add_tag_window(files: Vec<FileInfo>) {
-    init_gtk();
+    gtk_helpers::init_gtk();
 
     let window = gtk::Window::new(gtk::WindowType::Toplevel);
     window.set_title("TMSU");
@@ -82,15 +81,6 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
 
     window.show_all();
     gtk::main();
-}
-
-// workaround for https://github.com/gtk-rs/gtk/issues/405
-fn init_gtk() {
-    let mut argc = 0;
-    unsafe {
-        gtk_init(&mut argc, ptr::null_mut());
-        gtk::set_initialized();
-    }
 }
 
 fn add_tags(entry: &gtk::Entry, file_infos: &Vec<FileInfo>, window: &gtk::Window) {

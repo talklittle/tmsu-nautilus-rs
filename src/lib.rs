@@ -10,6 +10,7 @@ extern crate nautilus_extension;
 extern crate url;
 
 pub mod column_provider;
+mod gtk_helpers;
 pub mod info_provider;
 pub mod menu_provider;
 pub mod property_page_provider;

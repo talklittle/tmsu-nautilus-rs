@@ -1,6 +1,7 @@
 use glib::translate::*;
 use gtk;
 use gtk::prelude::*;
+use gtk_helpers;
 use nautilus_extension::{FileInfo, PropertyPage, PropertyPageProvider};
 use tags_list;
 
@@ -10,6 +11,7 @@ pub struct TmsuPropertyPageProvider {
 
 impl PropertyPageProvider for TmsuPropertyPageProvider {
     fn get_pages(&self, files: &Vec<FileInfo>) -> Vec<PropertyPage> {
+        gtk_helpers::init_gtk();
 
         let label_text = "TMSU tags";
         let label = gtk::Label::new(Some(label_text));
