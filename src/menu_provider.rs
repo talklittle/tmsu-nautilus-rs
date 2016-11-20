@@ -8,6 +8,7 @@ use gtk_helpers;
 use nautilus_extension::{FileInfo, Menu, MenuItem, MenuProvider};
 use std::path::Path;
 use std::process::Command;
+use tags_list;
 use url;
 
 pub struct TmsuMenuProvider {
@@ -17,23 +18,29 @@ pub struct TmsuMenuProvider {
 impl MenuProvider for TmsuMenuProvider {
     fn get_file_items(&self, _window: *mut GtkWidget, _files: &Vec<FileInfo>) -> Vec<MenuItem> {
         let mut top_menuitem = MenuItem::new(
-            "TmsuNautilusExtension::TMSU".to_string(), "TMSU".to_string(), "TMSU tags".to_string(), None
+            "TmsuNautilusExtension::TMSU", "TMSU", "TMSU tags", None
         );
 
         let mut add_tag_menuitem = MenuItem::new(
-            "TmsuNautilusExtension::Add_Tag".to_string(), "Add tags\u{2026}".to_string(), "Add tags\u{2026}".to_string(), None
+            "TmsuNautilusExtension::Add_Tag", "Add tags\u{2026}", "Add tags\u{2026}", None
         );
         add_tag_menuitem.set_activate_cb(add_tag_activate_cb);
 
-        let submenu = Menu::new(vec![add_tag_menuitem]);
+        let mut edit_tags_menuitem = MenuItem::new(
+            "TmsuNautilusExtension::Edit_Tags", "Edit tags\u{2026}", "Edit tags\u{2026}", None
+        );
+        edit_tags_menuitem.set_activate_cb(edit_tags_activate_cb);
 
-        top_menuitem.set_submenu(submenu);
+        let submenu = Menu::new(&vec![add_tag_menuitem, edit_tags_menuitem]);
+
+        top_menuitem.set_submenu(&submenu);
 
         vec![top_menuitem]
     }
 }
 
 nautilus_menu_item_activate_cb!(add_tag_activate_cb, show_add_tag_window);
+nautilus_menu_item_activate_cb!(edit_tags_activate_cb, show_edit_tags_window);
 
 fn show_add_tag_window(files: Vec<FileInfo>) {
     gtk_helpers::init_gtk();
@@ -122,5 +129,24 @@ fn invalidate_file_infos(files: &Vec<FileInfo>) {
     for i in 0..length {
         let ref file_info = files[i];
         file_info.invalidate_extension_info();
+    }
+}
+
+fn show_edit_tags_window(files: Vec<FileInfo>) {
+    init_gtk();
+
+    unsafe {
+        let window = gtk_window_new(GtkWindowType::Toplevel);
+        gtk_window_set_title(window as *mut GtkWindow, "TMSU\0".as_ptr() as *const c_char);
+        gtk_widget_set_size_request(window, 450, 500);
+        gtk_container_set_border_width(window as *mut GtkContainer, 10);
+        gtk_window_set_type_hint(window as *mut GtkWindow, GdkWindowTypeHint::Dialog);
+
+        let tags_list = tags_list::new_widget(&files);
+        gtk_container_add(window as *mut GtkContainer, tags_list);
+
+        gtk_widget_show_all(window);
+
+        gtk_main();
     }
 }
