@@ -1,40 +1,26 @@
 // GTK List Box widget
 
-use glib_ffi::{g_list_nth_data, gpointer, GFALSE, GTRUE};
-use gobject_ffi::{g_signal_connect_data, GConnectFlags, GObject};
-use gtk_ffi::{GtkAlign, GtkBox, GtkButton, GtkContainer, GtkLabel, GtkOrientation, GtkPolicyType, GtkScrolledWindow, GtkWidget};
-use gtk_ffi::{gtk_box_new, gtk_box_pack_end, gtk_box_pack_start};
-use gtk_ffi::{gtk_button_new, gtk_button_set_label};
-use gtk_ffi::{gtk_container_add, gtk_container_foreach, gtk_container_get_children, gtk_container_remove};
-use gtk_ffi::{gtk_label_new, gtk_label_get_text};
-use gtk_ffi::gtk_list_box_new;
-use gtk_ffi::{gtk_scrolled_window_new, gtk_scrolled_window_set_policy};
-use gtk_ffi::{gtk_widget_get_parent, gtk_widget_set_halign, gtk_widget_show_all};
-use libc::{c_char, c_void};
+use gtk;
+use gtk::prelude::*;
 use nautilus_extension::FileInfo;
-use std::ffi::CStr;
-use std::mem;
-use std::ptr;
 use tmsu_commands;
 use url;
 
-pub fn new_widget(files: &Vec<FileInfo>) -> *mut GtkWidget {
-    let scrolled_window = unsafe { gtk_scrolled_window_new(ptr::null_mut(), ptr::null_mut()) };
-    let list_box = unsafe { gtk_list_box_new() };
+pub fn new_widget(files: &Vec<FileInfo>) -> gtk::Widget {
+    let scrolled_window = gtk::ScrolledWindow::new(None, None);
+    scrolled_window.set_policy(gtk::PolicyType::Automatic, gtk::PolicyType::Always);
 
+    let mut list_box = gtk::ListBox::new();
     for file in files {
-        add_tag_rows_from_file(list_box, &file);
+        add_tag_rows_from_file(&mut list_box, &file);
     }
 
-    unsafe {
-        gtk_container_add(scrolled_window as *mut GtkContainer, list_box);
-        gtk_scrolled_window_set_policy(scrolled_window as *mut GtkScrolledWindow, GtkPolicyType::Automatic, GtkPolicyType::Always);
-    }
+    scrolled_window.add(&list_box);
 
-    scrolled_window
+    scrolled_window.upcast::<gtk::Widget>()
 }
 
-fn add_tag_rows_from_file(list_box: *mut GtkWidget, file: &FileInfo) {
+fn add_tag_rows_from_file(list_box: &mut gtk::ListBox, file: &FileInfo) {
     let tags_string =
         match file.attributes.get("tmsu_tags") {
             Some(value) => value.to_string(),
@@ -44,43 +30,33 @@ fn add_tag_rows_from_file(list_box: *mut GtkWidget, file: &FileInfo) {
     if tags_string.len() > 0 {
         for tag in tags_string.split(" ") {
             let row = list_box_row(tag, &file);
-            unsafe {
-                gtk_container_add(list_box as *mut GtkContainer, row);
-            }
+            list_box.add(&row);
         }
     }
 }
 
-fn list_box_row(tag: &str, file: &FileInfo) -> *mut GtkWidget {
-    let tag_c = format!("{}\0", tag);
+fn list_box_row(tag: &str, file: &FileInfo) -> gtk::Widget {
+    let hbox = gtk::Box::new(gtk::Orientation::Horizontal, 6);
 
-    unsafe {
-        let hbox = gtk_box_new(GtkOrientation::Horizontal, 6);
+    let tag_and_file_count_vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
+    hbox.pack_start(&tag_and_file_count_vbox, true, true, 6);
 
-        let tag_and_file_count_vbox = gtk_box_new(GtkOrientation::Vertical, 0);
-        gtk_box_pack_start(hbox as *mut GtkBox, tag_and_file_count_vbox, GTRUE, GTRUE, 6);
+    let tag_label = gtk::Label::new(Some(tag));
+    tag_label.set_halign(gtk::Align::Start);
+    tag_and_file_count_vbox.pack_start(&tag_label, true, true, 0);
 
-        let tag_label = gtk_label_new(tag_c.as_ptr() as *const c_char);
-        gtk_widget_set_halign(tag_label, GtkAlign::Start);
-        gtk_box_pack_start(tag_and_file_count_vbox as *mut GtkBox, tag_label, GTRUE, GTRUE, 0);
+    // TODO small label saying e.g. "2 files" if the tag applies to 2 of the selected files
 
-        // TODO small label saying e.g. "2 files" if the tag applies to 2 of the selected files
+    let remove_button = gtk::Button::new();
+    remove_button.set_label("Remove");
+    hbox.pack_end(&remove_button, false, false, 0);
 
-        let remove_button = gtk_button_new();
-        gtk_button_set_label(remove_button as *mut GtkButton, "Remove\0".as_ptr() as *const c_char);
-        gtk_box_pack_end(hbox as *mut GtkBox, remove_button, GFALSE, GFALSE, 0);
+    let file_clone = file.clone();
+    remove_button.connect_clicked(move |remove_button| {
+        on_clicked_remove_cb(&remove_button, &file_clone);
+    });
 
-        g_signal_connect_data(
-            remove_button as *mut GObject,
-            "clicked\0".as_ptr() as *const c_char,
-            Some(mem::transmute(on_clicked_remove_cb as *mut c_void)),
-            mem::transmute(Box::into_raw(Box::new(file.clone()))),
-            None,
-            GConnectFlags::empty()
-        );
-
-        hbox
-    }
+    hbox.upcast::<gtk::Widget>()
 }
 
 fn get_path(file_info: &FileInfo) -> String {
@@ -88,31 +64,26 @@ fn get_path(file_info: &FileInfo) -> String {
     url::percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned()
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn on_clicked_remove_cb(button: *mut GtkWidget, user_data: gpointer) {
-    let file_box:Box<FileInfo> = Box::from_raw(mem::transmute(user_data));
-    let file = *file_box;
+fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {
+    let hbox = button.get_parent().unwrap();
+    let list_box_row = hbox.get_parent().unwrap();
+    let mut list_box = list_box_row.get_parent().unwrap().downcast::<gtk::ListBox>().unwrap();
 
-    let hbox = gtk_widget_get_parent(button);
-    let list_box_row = gtk_widget_get_parent(hbox);
-    let list_box = gtk_widget_get_parent(list_box_row);
+    let tag_and_file_count_vbox = hbox.downcast::<gtk::Container>().unwrap().get_children()[0].clone();
 
-    let tag_and_file_count_vbox = g_list_nth_data(gtk_container_get_children(hbox as *mut GtkContainer), 0);
-    let tag_label = g_list_nth_data(gtk_container_get_children(tag_and_file_count_vbox as *mut GtkContainer), 0);
-    let tag = CStr::from_ptr(gtk_label_get_text(tag_label as *mut GtkLabel)).to_str().unwrap();
+    let tag_label = tag_and_file_count_vbox.downcast::<gtk::Container>().unwrap().get_children()[0].clone();
+    let tag = tag_label.downcast::<gtk::Label>().unwrap().get_text().unwrap();
 
     let path = get_path(&file);
-    tmsu_commands::untag(&path, tag);
+    tmsu_commands::untag(&path, &tag);
     file.invalidate_extension_info();
 
     // remove all and repopulate list
-    gtk_container_foreach(list_box as *mut GtkContainer, Some(remove_from_container), list_box as gpointer);
-    add_tag_rows_from_file(list_box, &file);
-    gtk_widget_show_all(list_box);
-}
 
-#[no_mangle]
-pub unsafe extern "C" fn remove_from_container(child: *mut GtkWidget, user_data: gpointer) {
-    let container = user_data as *mut GtkContainer;
-    gtk_container_remove(container, child);
+    for row in list_box.get_children() {
+        list_box.remove(&row);
+    }
+
+    add_tag_rows_from_file(&mut list_box, &file);
+    list_box.show_all();
 }
