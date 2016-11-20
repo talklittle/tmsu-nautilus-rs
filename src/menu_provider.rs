@@ -84,10 +84,12 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
     gtk::main();
 }
 
+// workaround for https://github.com/gtk-rs/gtk/issues/405
 fn init_gtk() {
     let mut argc = 0;
     unsafe {
         gtk_init(&mut argc, ptr::null_mut());
+        gtk::set_initialized();
     }
 }
 
