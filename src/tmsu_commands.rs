@@ -21,3 +21,13 @@ pub fn tags(path: &str) -> String {
 
     tags
 }
+
+pub fn untag(path: &str, tag: &str) {
+    Command::new("tmsu")
+        .arg("untag")
+        .arg(path)
+        .arg(tag)
+        .current_dir(Path::new(&path).parent().unwrap())
+        .output()
+        .expect("could not untag");
+}

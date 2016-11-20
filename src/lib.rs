@@ -12,7 +12,7 @@ pub mod column_provider;
 pub mod info_provider;
 pub mod menu_provider;
 pub mod property_page_provider;
-mod tags_list;
+pub mod tags_list;
 mod tmsu_commands;
 pub mod tmsu_nautilus;
 
