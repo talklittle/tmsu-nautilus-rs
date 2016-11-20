@@ -133,42 +133,25 @@ fn invalidate_file_infos(files: &Vec<FileInfo>) {
 }
 
 fn show_edit_tags_window(files: Vec<FileInfo>) {
-    init_gtk();
+    gtk_helpers::init_gtk();
 
-    unsafe {
-        let window = gtk_window_new(GtkWindowType::Toplevel);
-        gtk_window_set_title(window as *mut GtkWindow, "TMSU\0".as_ptr() as *const c_char);
-        gtk_widget_set_size_request(window, 450, 500);
-        gtk_container_set_border_width(window as *mut GtkContainer, 10);
-        gtk_window_set_type_hint(window as *mut GtkWindow, GdkWindowTypeHint::Dialog);
+    let window = gtk::Window::new(gtk::WindowType::Toplevel);
+    window.set_title("TMSU");
+    window.set_size_request(450, 500);
+    window.set_border_width(10);
+    window.set_type_hint(gdk::WindowTypeHint::Dialog);
 
-        let tags_list = tags_list::new_widget(&files);
-        gtk_container_add(window as *mut GtkContainer, tags_list);
+    let tags_list = tags_list::new_widget(&files);
 
-        let edit_tags_window_data = EditTagsWindowData {
-            files: files.clone(),
-        };
-        let edit_tags_window_data_raw = Box::into_raw(Box::new(edit_tags_window_data));
+    window.add(&tags_list);
 
-        g_signal_connect_data(
-            window as *mut GObject,
-            "delete-event\0".as_ptr() as *const c_char,
-            Some(mem::transmute(on_delete_edit_tags_window_cb as *mut c_void)),
-            mem::transmute(edit_tags_window_data_raw),
-            None,
-            GConnectFlags::empty()
-        );
-        g_signal_connect_data(
-            window as *mut GObject,
-            "destroy\0".as_ptr() as *const c_char,
-            Some(mem::transmute(on_destroy_window_cb as *mut c_void)),
-            ptr::null_mut(),
-            None,
-            GConnectFlags::empty()
-        );
+    let files_clone = files.clone();
+    window.connect_delete_event(move |_, _| {
+        invalidate_file_infos(&files_clone);
+        gtk::main_quit();
+        Inhibit(false)
+    });
 
-        gtk_widget_show_all(window);
-
-        gtk_main();
-    }
+    window.show_all();
+    gtk::main();
 }
