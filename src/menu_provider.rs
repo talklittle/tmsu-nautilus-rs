@@ -6,9 +6,8 @@ use gtk::prelude::*;
 use gtk_ffi::GtkWidget;
 use gtk_helpers;
 use nautilus_extension::{FileInfo, Menu, MenuItem, MenuProvider};
-use std::path::Path;
-use std::process::Command;
 use tags_list;
+use tmsu_commands;
 use url;
 
 pub struct TmsuMenuProvider {
@@ -101,15 +100,8 @@ fn add_tags(entry: &gtk::Entry, file_infos: &Vec<FileInfo>, window: &gtk::Window
     let entry_text = entry.get_text().unwrap();
     let filenames = filenames(file_infos);
 
-    for tag in entry_text.split_whitespace() {
-        Command::new("tmsu")
-                .arg("tag")
-                .arg(format!("--tags=\"{}\"", tag))
-                .args(&filenames)
-                .current_dir(Path::new(&filenames[0]).parent().unwrap())
-                .output()
-                .expect("failed to tag files");
-    }
+    let tags = entry_text.split_whitespace().map(String::from).collect();
+    tmsu_commands::add_tags(&filenames, &tags);
 
     window.close();
 }

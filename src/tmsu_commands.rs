@@ -22,6 +22,18 @@ pub fn tags(path: &str) -> String {
     tags
 }
 
+pub fn add_tags(filenames: &Vec<String>, tags: &Vec<String>) {
+    for tag in tags {
+        Command::new("tmsu")
+                .arg("tag")
+                .arg(format!("--tags=\"{}\"", tag))
+                .args(&filenames)
+                .current_dir(Path::new(&filenames[0]).parent().unwrap())
+                .output()
+                .expect("failed to tag files");
+    }
+}
+
 pub fn untag(path: &str, tag: &str) {
     Command::new("tmsu")
         .arg("untag")
