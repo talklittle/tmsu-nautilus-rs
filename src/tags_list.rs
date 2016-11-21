@@ -104,7 +104,7 @@ fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {
     }
 
     add_tag_rows_from_file(&mut list_box, &file);
-    list_box.show_all();
+    list_box.show();
 }
 
 fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow, files: &Vec<FileInfo>) {
