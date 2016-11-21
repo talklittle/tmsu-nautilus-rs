@@ -6,8 +6,8 @@ use gtk::prelude::*;
 use gtk_ffi::GtkWidget;
 use gtk_helpers;
 use nautilus_extension::{FileInfo, Menu, MenuItem, MenuProvider};
-use std::path::Path;
-use std::process::Command;
+use tags_list;
+use tmsu_commands;
 use url;
 
 pub struct TmsuMenuProvider {
@@ -15,25 +15,38 @@ pub struct TmsuMenuProvider {
 }
 
 impl MenuProvider for TmsuMenuProvider {
-    fn get_file_items(&self, _window: *mut GtkWidget, _files: &Vec<FileInfo>) -> Vec<MenuItem> {
+    fn get_file_items(&self, _window: *mut GtkWidget, files: &Vec<FileInfo>) -> Vec<MenuItem> {
         let mut top_menuitem = MenuItem::new(
-            "TmsuNautilusExtension::TMSU".to_string(), "TMSU".to_string(), "TMSU tags".to_string(), None
+            "TmsuNautilusExtension::TMSU", "TMSU", "TMSU tags", None
         );
+
+        let mut sub_items: Vec<MenuItem> = vec![];
 
         let mut add_tag_menuitem = MenuItem::new(
-            "TmsuNautilusExtension::Add_Tag".to_string(), "Add tags\u{2026}".to_string(), "Add tags\u{2026}".to_string(), None
+            "TmsuNautilusExtension::Add_Tag", "Add tags\u{2026}", "Add tags\u{2026}", None
         );
         add_tag_menuitem.set_activate_cb(add_tag_activate_cb);
+        sub_items.push(add_tag_menuitem);
 
-        let submenu = Menu::new(vec![add_tag_menuitem]);
+        // TODO Edit multiple selected files
+        if files.len() == 1 {
+            let mut edit_tags_menuitem = MenuItem::new(
+                "TmsuNautilusExtension::Edit_Tags", "Edit tags\u{2026}", "Edit tags\u{2026}", None
+            );
+            edit_tags_menuitem.set_activate_cb(edit_tags_activate_cb);
+            sub_items.push(edit_tags_menuitem);
+        }
 
-        top_menuitem.set_submenu(submenu);
+        let submenu = Menu::new(&sub_items);
+
+        top_menuitem.set_submenu(&submenu);
 
         vec![top_menuitem]
     }
 }
 
 nautilus_menu_item_activate_cb!(add_tag_activate_cb, show_add_tag_window);
+nautilus_menu_item_activate_cb!(edit_tags_activate_cb, show_edit_tags_window);
 
 fn show_add_tag_window(files: Vec<FileInfo>) {
     gtk_helpers::init_gtk();
@@ -87,15 +100,8 @@ fn add_tags(entry: &gtk::Entry, file_infos: &Vec<FileInfo>, window: &gtk::Window
     let entry_text = entry.get_text().unwrap();
     let filenames = filenames(file_infos);
 
-    for tag in entry_text.split_whitespace() {
-        Command::new("tmsu")
-                .arg("tag")
-                .arg(format!("--tags=\"{}\"", tag))
-                .args(&filenames)
-                .current_dir(Path::new(&filenames[0]).parent().unwrap())
-                .output()
-                .expect("failed to tag files");
-    }
+    let tags = entry_text.split_whitespace().map(String::from).collect();
+    tmsu_commands::add_tags(&filenames, &tags);
 
     window.close();
 }
@@ -123,4 +129,28 @@ fn invalidate_file_infos(files: &Vec<FileInfo>) {
         let ref file_info = files[i];
         file_info.invalidate_extension_info();
     }
+}
+
+fn show_edit_tags_window(files: Vec<FileInfo>) {
+    gtk_helpers::init_gtk();
+
+    let window = gtk::Window::new(gtk::WindowType::Toplevel);
+    window.set_title("TMSU");
+    window.set_size_request(450, 500);
+    window.set_border_width(10);
+    window.set_type_hint(gdk::WindowTypeHint::Dialog);
+
+    let tags_list = tags_list::new_widget(&files);
+
+    window.add(&tags_list);
+
+    let files_clone = files.clone();
+    window.connect_delete_event(move |_, _| {
+        invalidate_file_infos(&files_clone);
+        gtk::main_quit();
+        Inhibit(false)
+    });
+
+    window.show();
+    gtk::main();
 }
