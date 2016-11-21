@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 (2016-11-21)
+
+* Added dialog to list, edit, and remove tags.
+* Properties tab.
+* Refactored code to remove almost all unsafe code.
+
 ## 0.2.1 (2016-09-17)
 
 * Info provider: Use Mutex and fix Arc misuse that was possibly leading to segfault.
