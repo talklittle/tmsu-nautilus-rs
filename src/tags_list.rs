@@ -7,8 +7,11 @@ use tmsu_commands;
 use url;
 
 pub fn new_widget(files: &Vec<FileInfo>) -> gtk::Widget {
+    let frame = gtk::Frame::new(None);
+
     let scrolled_window = gtk::ScrolledWindow::new(None, None);
     scrolled_window.set_policy(gtk::PolicyType::Automatic, gtk::PolicyType::Always);
+    frame.add(&scrolled_window);
 
     let mut list_box = gtk::ListBox::new();
     for file in files {
@@ -17,7 +20,7 @@ pub fn new_widget(files: &Vec<FileInfo>) -> gtk::Widget {
 
     scrolled_window.add(&list_box);
 
-    scrolled_window.upcast::<gtk::Widget>()
+    frame.upcast::<gtk::Widget>()
 }
 
 fn add_tag_rows_from_file(list_box: &mut gtk::ListBox, file: &FileInfo) {
