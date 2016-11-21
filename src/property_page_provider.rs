@@ -11,6 +11,11 @@ pub struct TmsuPropertyPageProvider {
 
 impl PropertyPageProvider for TmsuPropertyPageProvider {
     fn get_pages(&self, files: &Vec<FileInfo>) -> Vec<PropertyPage> {
+        // TODO Edit tags for multiple selected files
+        if files.len() != 1 {
+            return vec![];
+        }
+
         gtk_helpers::init_gtk();
 
         let label_text = "TMSU tags";

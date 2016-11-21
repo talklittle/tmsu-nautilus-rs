@@ -16,22 +16,29 @@ pub struct TmsuMenuProvider {
 }
 
 impl MenuProvider for TmsuMenuProvider {
-    fn get_file_items(&self, _window: *mut GtkWidget, _files: &Vec<FileInfo>) -> Vec<MenuItem> {
+    fn get_file_items(&self, _window: *mut GtkWidget, files: &Vec<FileInfo>) -> Vec<MenuItem> {
         let mut top_menuitem = MenuItem::new(
             "TmsuNautilusExtension::TMSU", "TMSU", "TMSU tags", None
         );
+
+        let mut sub_items: Vec<MenuItem> = vec![];
 
         let mut add_tag_menuitem = MenuItem::new(
             "TmsuNautilusExtension::Add_Tag", "Add tags\u{2026}", "Add tags\u{2026}", None
         );
         add_tag_menuitem.set_activate_cb(add_tag_activate_cb);
+        sub_items.push(add_tag_menuitem);
 
-        let mut edit_tags_menuitem = MenuItem::new(
-            "TmsuNautilusExtension::Edit_Tags", "Edit tags\u{2026}", "Edit tags\u{2026}", None
-        );
-        edit_tags_menuitem.set_activate_cb(edit_tags_activate_cb);
+        // TODO Edit multiple selected files
+        if files.len() == 1 {
+            let mut edit_tags_menuitem = MenuItem::new(
+                "TmsuNautilusExtension::Edit_Tags", "Edit tags\u{2026}", "Edit tags\u{2026}", None
+            );
+            edit_tags_menuitem.set_activate_cb(edit_tags_activate_cb);
+            sub_items.push(edit_tags_menuitem);
+        }
 
-        let submenu = Menu::new(&vec![add_tag_menuitem, edit_tags_menuitem]);
+        let submenu = Menu::new(&sub_items);
 
         top_menuitem.set_submenu(&submenu);
 
