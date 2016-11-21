@@ -17,6 +17,11 @@ impl PropertyPageProvider for TmsuPropertyPageProvider {
         let label = gtk::Label::new(Some(label_text));
 
         let list = tags_list::new_widget(files);
+        let margin = 10;
+        list.set_margin_top(margin);
+        list.set_margin_bottom(margin);
+        list.set_margin_left(margin);
+        list.set_margin_right(margin);
 
         list.show_all();
 
