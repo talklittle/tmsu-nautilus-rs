@@ -18,7 +18,10 @@ pub fn new_widget(files: &Vec<FileInfo>) -> gtk::Widget {
         add_tag_rows_from_file(&mut list_box, &file);
     }
 
-    list_box.connect_row_activated(on_row_activated);
+    let files_clone = files.clone();
+    list_box.connect_row_activated(move |list_box, list_box_row| {
+        on_row_activated(list_box, list_box_row, &files_clone);
+    });
     list_box.show();
 
     scrolled_window.add(&list_box);
@@ -104,7 +107,7 @@ fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {
     list_box.show_all();
 }
 
-fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow) {
+fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow, files: &Vec<FileInfo>) {
     let hbox = list_box_row.get_children()[0].clone().downcast::<gtk::Box>().unwrap();
     let tag_and_file_count_vbox = hbox.get_children()[0].clone().downcast::<gtk::Box>().unwrap();
 
@@ -126,8 +129,19 @@ fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow) {
     entry.grab_focus();
 
     let tag_label_clone = tag_label.clone();
+    let files_clone = files.clone();
     entry.connect_activate(move |entry| {
-        // TODO untag old and tag new using TMSU command
+        // untag old and tag new
+
+        let old_tag = tag_label_clone.get_text().unwrap();
+        let new_tags = entry.get_text().unwrap().split_whitespace().map(String::from).collect();
+
+        for ref file in &files_clone {
+            let path = get_path(&file);
+            tmsu_commands::untag(&path, &old_tag);
+            tmsu_commands::add_tags(&vec![path], &new_tags);
+            file.invalidate_extension_info();
+        }
 
         tag_label_clone.set_text(&entry.get_text().unwrap());
 
