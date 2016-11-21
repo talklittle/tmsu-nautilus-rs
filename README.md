@@ -2,8 +2,7 @@
 
 GNOME Nautilus extension for file tagging using [TMSU](https://github.com/oniony/TMSU/).
 
-![column with tags](https://github.com/talklittle/tmsu-nautilus-rs/raw/master/screenshot-column.png)
-![add tags](https://github.com/talklittle/tmsu-nautilus-rs/raw/master/screenshot-add-tags.png)
+**[Screenshots](SCREENSHOTS.md)**
 
 ## Requirements
 
