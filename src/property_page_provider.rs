@@ -28,7 +28,7 @@ impl PropertyPageProvider for TmsuPropertyPageProvider {
         list.set_margin_left(margin);
         list.set_margin_right(margin);
 
-        list.show_all();
+        list.show();
 
         vec![
             PropertyPage::new("TMSU tags", label.to_glib_none().0, list.to_glib_none().0)

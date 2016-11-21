@@ -159,6 +159,6 @@ fn show_edit_tags_window(files: Vec<FileInfo>) {
         Inhibit(false)
     });
 
-    window.show_all();
+    window.show();
     gtk::main();
 }
