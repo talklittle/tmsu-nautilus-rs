@@ -5,10 +5,10 @@ INSTALL_DIR=$(DESTDIR)/usr/lib/nautilus/extensions-3.0
 VER=$(shell grep version Cargo.toml | head -1 | awk '{print $$3}' | tr -d '"' | tr -d "\n")
 SHELL=/bin/sh
 ARCH=$(shell uname -m)
-DIST_NAME=nautilus-tmsu-$(ARCH)-$(VER)
+DIST_NAME=tmsu-nautilus-$(ARCH)-$(VER)
 DIST_DIR=$(DIST_NAME)
 DIST_FILE=$(DIST_NAME).tgz
-DIST_SO_FILENAME=libnautilus-tmsu.so
+DIST_SO_FILENAME=libtmsu-nautilus.so
 BUILD_SO_FILENAME=libtmsu_nautilus.so
 
 all: clean compile dist test
