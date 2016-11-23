@@ -25,7 +25,7 @@ Kill and restart Nautilus:
 
 ## Compiling from source
 
-    sudo apt install libnautilus-extension-dev
+    sudo apt install libnautilus-extension-dev libgtk-3-0
     cd tmsu-nautilus-rs
     make
 
