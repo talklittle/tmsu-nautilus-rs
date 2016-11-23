@@ -27,13 +27,7 @@ Kill and restart Nautilus:
 
     sudo apt install libnautilus-extension-dev
     cd tmsu-nautilus-rs
-    cargo build --release
-
-### (Optional) Reduce shared library file size
-
-See [issue #7](https://github.com/talklittle/tmsu-nautilus-rs/issues/7)
-
-    strip target/release/libtmsu_nautilus.so
+    make
 
 ## Release notes
 
