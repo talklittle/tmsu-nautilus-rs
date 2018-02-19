@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 (2018-02-19)
+
+* Fix compilation on Rust 1.24.
+
 ## 0.3.0 (2016-11-21)
 
 * Added dialog to list, edit, and remove tags.

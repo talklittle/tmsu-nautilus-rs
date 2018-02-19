@@ -27,7 +27,7 @@ pub fn add_tags(filenames: &Vec<String>, tags: &Vec<String>) {
         Command::new("tmsu")
                 .arg("tag")
                 .arg(format!("--tags=\"{}\"", tag))
-                .args(&filenames)
+                .args(filenames)
                 .current_dir(Path::new(&filenames[0]).parent().unwrap())
                 .output()
                 .expect("failed to tag files");
