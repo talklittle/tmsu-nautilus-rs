@@ -62,7 +62,7 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
 
     let files_count = files.len();
     let prompt_text = format!("Add (space-separated) tags to {} file{}", files_count, if files_count == 1 { "" } else { "s" });
-    let prompt_label = gtk::Label::new(Some(&prompt_text));
+    let prompt_label = gtk::Label::new(Some(&*prompt_text));
     vbox.pack_start(&prompt_label, true, true, 0);
 
     let entry = gtk::Entry::new();
