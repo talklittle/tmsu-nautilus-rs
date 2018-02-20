@@ -2,7 +2,9 @@
 
 ## 0.4.0 (2018-02-19)
 
-* Fix compilation on Rust 1.24.
+* Fixed compilation on Rust 1.24.
+* Require GTK+ 3.18+.
+* Updated gtk-rs dependencies for various fixes.
 
 ## 0.3.0 (2016-11-21)
 
