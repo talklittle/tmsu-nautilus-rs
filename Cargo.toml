@@ -8,18 +8,50 @@ name = "tmsu_nautilus"
 crate-type = ["dylib"]
 
 [dependencies]
-gdk = "0.5.0"
-glib = "0.1.0"
-glib-sys = "0.3.1"
-gobject-sys = "0.3.1"
+gdk = "0.7.0"
+glib = "0.4.0"
+glib-sys = "0.5.0"
+gobject-sys = "0.5.0"
 libc = "0.2"
-nautilus-extension = "0.2.3"
+nautilus-extension = "0.3.0"
 url = "1.2.0"
 
 [dependencies.gtk]
-version = "0.1.0"
-features = ["v3_10"]
+version = "0.3.0"
+features = ["v3_18"]
 
 [dependencies.gtk-sys]
-version = "0.3.1"
-features = ["v3_10"]
+version = "0.5.0"
+features = ["v3_18"]
+
+[patch.crates-io]
+cairo-rs = { git = "https://github.com/gtk-rs/cairo.git" }
+cairo-sys-rs = { git = "https://github.com/gtk-rs/cairo.git" }
+gdk = { git = "https://github.com/gtk-rs/gdk.git" }
+gdk-pixbuf = { git = "https://github.com/gtk-rs/gdk-pixbuf.git" }
+gio = { git = "https://github.com/gtk-rs/gio.git" }
+glib = { git = "https://github.com/gtk-rs/glib.git" }
+gtk = { git = "https://github.com/gtk-rs/gtk.git" }
+pango = { git = "https://github.com/gtk-rs/pango.git" }
+atk-sys = { git = "https://github.com/gtk-rs/sys" }
+gdk-pixbuf-sys = { git = "https://github.com/gtk-rs/sys" }
+gio-sys = { git = "https://github.com/gtk-rs/sys" }
+glib-sys = { git = "https://github.com/gtk-rs/sys" }
+gobject-sys = { git = "https://github.com/gtk-rs/sys" }
+gtk-sys = { git = "https://github.com/gtk-rs/sys" }
+pango-sys = { git = "https://github.com/gtk-rs/sys" }
+#cairo-rs = { git = "https://github.com/gtk-rs/cairo.git", rev = "b01edff7" }
+#cairo-sys-rs = { git = "https://github.com/gtk-rs/cairo.git", rev = "b01edff7" }
+#gdk = { git = "https://github.com/gtk-rs/gdk.git", rev = "ac4653d6" }
+#gdk-pixbuf = { git = "https://github.com/gtk-rs/gdk-pixbuf.git", rev = "2aba23ce" }
+#gio = { git = "https://github.com/gtk-rs/gio.git", rev = "6eb083c5" }
+#glib = { git = "https://github.com/gtk-rs/glib.git", rev = "d36c43a0" }
+#gtk = { git = "https://github.com/gtk-rs/gtk.git", rev = "b3af3422" }
+#pango = { git = "https://github.com/gtk-rs/pango.git", rev = "19f67bf8" }
+#atk-sys = { git = "https://github.com/gtk-rs/sys", rev = "53beb6a4" }
+#gdk-pixbuf-sys = { git = "https://github.com/gtk-rs/sys", rev = "53beb6a4" }
+#gio-sys = { git = "https://github.com/gtk-rs/sys", rev = "53beb6a4" }
+#glib-sys = { git = "https://github.com/gtk-rs/sys", rev = "53beb6a4" }
+#gobject-sys = { git = "https://github.com/gtk-rs/sys", rev = "53beb6a4" }
+#gtk-sys = { git = "https://github.com/gtk-rs/sys", rev = "53beb6a4" }
+#pango-sys = { git = "https://github.com/gtk-rs/sys", rev = "53beb6a4" }
