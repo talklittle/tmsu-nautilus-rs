@@ -25,8 +25,8 @@ impl PropertyPageProvider for TmsuPropertyPageProvider {
         let margin = 10;
         list.set_margin_top(margin);
         list.set_margin_bottom(margin);
-        list.set_margin_left(margin);
-        list.set_margin_right(margin);
+        list.set_margin_start(margin);
+        list.set_margin_end(margin);
 
         list.show();
 
