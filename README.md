@@ -7,7 +7,7 @@ GNOME Nautilus extension for file tagging using [TMSU](https://github.com/oniony
 ## Requirements
 
 * Nautilus 3
-* Gtk+ 3.10+
+* Gtk+ 3.18+
 * [TMSU](https://github.com/oniony/TMSU/) 0.6.1+
 * Rust 1.24+ (if compiling from source)
 
