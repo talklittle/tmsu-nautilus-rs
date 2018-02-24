@@ -11,7 +11,7 @@ DIST_FILE=$(DIST_NAME).tgz
 DIST_SO_FILENAME=libtmsu-nautilus.so
 BUILD_SO_FILENAME=libtmsu_nautilus.so
 
-all: clean compile dist test
+all: clean test compile dist
 
 clean:
 	@echo
