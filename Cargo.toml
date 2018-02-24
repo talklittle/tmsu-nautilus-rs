@@ -2,10 +2,19 @@
 name = "tmsu-nautilus"
 version = "0.4.0"
 authors = ["Andrew Shu <talklittle@gmail.com>"]
+license = "GPL-3.0-only"
+description = "Nautilus 3.0 extension for file tagging using TMSU"
+repository = "https://github.com/talklittle/tmsu-nautilus-rs"
+readme = "README.md"
 
 [lib]
 name = "tmsu_nautilus"
 crate-type = ["dylib"]
+
+[package.metadata.deb]
+assets = [
+    ["target/release/libtmsu_nautilus.so", "usr/lib/nautilus/extensions-3.0/libtmsu-nautilus.so", "644"],
+]
 
 [dependencies]
 gdk = "0.7.0"
