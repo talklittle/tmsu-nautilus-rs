@@ -15,12 +15,18 @@ GNOME Nautilus extension for file tagging using [TMSU](https://github.com/oniony
 
 Download the latest release from [Releases](https://github.com/talklittle/tmsu-nautilus-rs/releases).
 
-Copy (or symlink) `libtmsu-nautilus.so` into the extensions directory:
+**From .deb (Ubuntu/Debian):**
+
+    sudo dpkg -i tmsu-nautilus_${VERSION}_${ARCH}.deb
+
+    # Kill and restart Nautilus:
+    nautilus -q
+
+**Alternatively, copy .so manually:**
 
     sudo cp libtmsu-nautilus.so /usr/lib/nautilus/extensions-3.0/libtmsu-nautilus.so
 
-Kill and restart Nautilus:
-
+    # Kill and restart Nautilus:
     nautilus -q
 
 ## Compiling from source
@@ -28,6 +34,9 @@ Kill and restart Nautilus:
     sudo apt install libnautilus-extension-dev libgtk-3-0
     cd tmsu-nautilus-rs
     make
+
+    # (Optional) Generate .deb file. Requires https://github.com/mmstick/cargo-deb
+    cargo deb --no-build
 
 ## Release notes
 
