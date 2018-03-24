@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 (2018-03-24)
+
+* Handle filenames with colon (`:`).
+
 ## 0.4.0 (2018-02-19)
 
 * Fixed compilation on Rust 1.24.
