@@ -33,17 +33,15 @@ pub fn new_widget(files: &Vec<FileInfo>) -> gtk::Widget {
 }
 
 fn add_tag_rows_from_file(list_box: &mut gtk::ListBox, file: &FileInfo) {
-    let tags_string =
+    let tags =
         match file.attributes.get("tmsu_tags") {
-            Some(value) => value.to_string(),
+            Some(value) => value.split_whitespace().map(|s| s.to_owned()).collect(),
             None => tmsu_commands::tags(&get_path(&file)),
         };
 
-    if tags_string.len() > 0 {
-        for tag in tags_string.split(" ") {
-            let row = list_box_row(tag, &file);
-            list_box.add(&row);
-        }
+    for tag in tags {
+        let row = list_box_row(&tag, &file);
+        list_box.add(&row);
     }
 }
 
