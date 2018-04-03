@@ -228,7 +228,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "nautilus-extension"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "gio-sys 0.5.0 (git+https://github.com/gtk-rs/sys)",
@@ -298,7 +298,7 @@ dependencies = [
  "gtk 0.3.0 (git+https://github.com/gtk-rs/gtk.git)",
  "gtk-sys 0.5.0 (git+https://github.com/gtk-rs/sys)",
  "libc 0.2.36 (registry+https://github.com/rust-lang/crates.io-index)",
- "nautilus-extension 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "nautilus-extension 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -365,7 +365,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum lazy_static 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c8f31047daa365f19be14b47c29df4f7c3b581832407daabe6ae77397619237d"
 "checksum libc 0.2.36 (registry+https://github.com/rust-lang/crates.io-index)" = "1e5d97d6708edaa407429faa671b942dc0f2727222fb6b6539bf1db936e4b121"
 "checksum matches 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "100aabe6b8ff4e4a7e32c1c13523379802df0772b82466207ac25b013f193376"
-"checksum nautilus-extension 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "303481c1a2cd7e50aeb089f461d19d4ae8a601444cb88f978822c2be6a04e1f0"
+"checksum nautilus-extension 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "808f4111e908a18a53144b0b8bda01d1466d01ea18b771735b0a1c4f1b1d307c"
 "checksum nautilus-extension-sys 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a5481d399dad2930143038ae054d03798680ffb036360d1c6736b116fb748da1"
 "checksum pango 0.3.0 (git+https://github.com/gtk-rs/pango)" = "<none>"
 "checksum pango-sys 0.5.0 (git+https://github.com/gtk-rs/sys)" = "<none>"
