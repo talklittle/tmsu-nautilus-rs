@@ -20,7 +20,7 @@ impl MenuProvider for TmsuMenuProvider {
             "TmsuNautilusExtension::TMSU", "TMSU", "TMSU tags", None
         );
 
-        let mut sub_items: Vec<MenuItem> = vec![];
+        let mut sub_items: Vec<MenuItem> = Vec::new();
 
         let mut add_tag_menuitem = MenuItem::new(
             "TmsuNautilusExtension::Add_Tag", "Add tags\u{2026}", "Add tags\u{2026}", None
@@ -107,7 +107,7 @@ fn add_tags(entry: &gtk::Entry, file_infos: &Vec<FileInfo>, window: &gtk::Window
 }
 
 fn filenames(files: &Vec<FileInfo>) -> Vec<String> {
-    let mut filenames = vec![];
+    let mut filenames = Vec::new();
     let length = files.len();
     for i in 0..length {
         let ref file_info = files[i];

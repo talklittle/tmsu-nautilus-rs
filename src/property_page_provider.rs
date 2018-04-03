@@ -13,7 +13,7 @@ impl PropertyPageProvider for TmsuPropertyPageProvider {
     fn get_pages(&self, files: &Vec<FileInfo>) -> Vec<PropertyPage> {
         // TODO Edit tags for multiple selected files
         if files.len() != 1 {
-            return vec![];
+            return Vec::new();
         }
 
         gtk_helpers::init_gtk();
