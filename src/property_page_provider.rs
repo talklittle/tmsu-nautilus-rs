@@ -31,7 +31,7 @@ impl PropertyPageProvider for TmsuPropertyPageProvider {
         list.show();
 
         vec![
-            PropertyPage::new("TMSU tags", label.to_glib_none().0, list.to_glib_none().0)
+            PropertyPage::new("TMSU tags", label.to_glib_full(), list.to_glib_full())
         ]
     }
 }
