@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.2 (2018-04-03)
+
+* Fixed crash on Properties page.
+
 ## 0.4.1 (2018-03-24)
 
 * Handle filenames with colon (`:`).

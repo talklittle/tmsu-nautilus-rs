@@ -289,7 +289,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "tmsu-nautilus"
-version = "0.4.1"
+version = "0.4.2"
 dependencies = [
  "gdk 0.7.0 (git+https://github.com/gtk-rs/gdk)",
  "glib 0.4.1 (git+https://github.com/gtk-rs/glib)",
