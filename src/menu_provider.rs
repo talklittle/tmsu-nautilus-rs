@@ -110,7 +110,7 @@ fn filenames(files: &Vec<FileInfo>) -> Vec<String> {
     let mut filenames = Vec::new();
     let length = files.len();
     for i in 0..length {
-        let ref file_info = files[i];
+        let file_info = &files[i];
         let uri_scheme = file_info.get_uri_scheme();
         if uri_scheme != "file" {
             continue;
@@ -126,7 +126,7 @@ fn filenames(files: &Vec<FileInfo>) -> Vec<String> {
 fn invalidate_file_infos(files: &Vec<FileInfo>) {
     let length = files.len();
     for i in 0..length {
-        let ref file_info = files[i];
+        let file_info = &files[i];
         file_info.invalidate_extension_info();
     }
 }
