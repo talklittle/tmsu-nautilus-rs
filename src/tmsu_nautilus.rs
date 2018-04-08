@@ -11,7 +11,7 @@ use property_page_provider;
 nautilus_module!(init);
 
 fn init(module: *mut GTypeModule) -> GType {
-    println!("Initializing TMSU Nautilus");
+    println!("Initializing TMSU Nautilus {}", env!("CARGO_PKG_VERSION"));
 
     NautilusModule::new(module, "TmsuNautilusExtension")
         .add_column_provider(column_provider::TmsuColumnProvider {})
