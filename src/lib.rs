@@ -1,3 +1,5 @@
+#![deny(bare_trait_objects)]
+
 extern crate gdk;
 extern crate glib;
 extern crate glib_sys as glib_ffi;
