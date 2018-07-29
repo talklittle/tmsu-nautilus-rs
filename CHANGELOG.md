@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.0 (2018-07-28)
+
+* Fixed crash on Properties page when opening remote files.
+* Require Rust 1.27.
+
 ## 0.4.2 (2018-04-03)
 
 * Fixed crash on Properties page.
