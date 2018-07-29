@@ -2,16 +2,23 @@ use std::path::Path;
 use std::process::Command;
 
 pub fn tags(path: &str) -> Vec<String> {
-    let output = Command::new("tmsu")
+    let output_result = Command::new("tmsu")
                          .arg("tags")
                          .arg("-1")  // one tag per line
                          .arg(&path)
                          .current_dir(Path::new(&path).parent().unwrap())
-                         .output()
-                         .expect("could not query tmsu tags");
+                         .output();
 
-    let output_string = String::from_utf8(output.stdout).unwrap();
-    output_string.lines().skip(1).map(|s| s.to_owned()).collect()
+    match output_result {
+        Ok(output) => {
+            let output_string = String::from_utf8(output.stdout).unwrap();
+            output_string.lines().skip(1).map(|s| s.to_owned()).collect()
+        },
+        Err(err) => {
+            eprintln!("could not query tmsu tags: {}", err);
+            Vec::new()
+        }
+    }
 }
 
 pub fn add_tags(filenames: &Vec<String>, tags: &Vec<String>) {
