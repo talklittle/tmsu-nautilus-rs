@@ -29,6 +29,10 @@ Download the latest release from [Releases](https://github.com/talklittle/tmsu-n
     # Kill and restart Nautilus:
     nautilus -q
 
+**Archlinux AUR**
+
+Use the AUR package [nautilus-tmsu-rs-git](https://aur.archlinux.org/packages/nautilus-tmsu-rs-git/).
+
 ## Compiling from source
 
     sudo apt install libnautilus-extension-dev libgtk-3-0
