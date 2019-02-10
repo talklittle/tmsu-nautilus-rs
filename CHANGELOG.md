@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.2 (2019-02-10)
+
+* Fixed Debian .deb package dependencies.
+
 ## 0.5.1 (2019-02-10)
 
 * Updated dependencies.
