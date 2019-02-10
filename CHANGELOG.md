@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1 (2019-02-10)
+
+* Updated dependencies.
+* Built with Rust 1.32 (not a strict requirement).
+
 ## 0.5.0 (2018-07-28)
 
 * Fixed crash on Properties page when opening remote files.
