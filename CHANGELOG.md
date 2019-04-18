@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.3 (2019-04-18)
+
+* Updated nautilus-extension to 0.4.0.
+
 ## 0.5.2 (2019-02-10)
 
 * Fixed Debian .deb package dependencies.
