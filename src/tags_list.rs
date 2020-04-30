@@ -9,7 +9,7 @@ use url;
 pub fn new_widget(files: &Vec<FileInfo>) -> gtk::Widget {
     let frame = gtk::Frame::new(None);
 
-    let scrolled_window = gtk::ScrolledWindow::new(None, None);
+    let scrolled_window = gtk::ScrolledWindowBuilder::new().build();
     scrolled_window.set_policy(gtk::PolicyType::Automatic, gtk::PolicyType::Always);
     frame.add(&scrolled_window);
 

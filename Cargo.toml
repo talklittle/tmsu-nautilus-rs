@@ -18,19 +18,19 @@ assets = [
 ]
 
 [dependencies]
-gdk = "0.7.0"
-glib = "0.4.0"
-glib-sys = "0.5.0"
-gobject-sys = "0.5.0"
+gdk = "0.12.1"
+glib = "0.9.3"
+glib-sys = "0.9.1"
+gobject-sys = "0.9.1"
 libc = "0.2"
-nautilus-extension = "0.4.0"
+nautilus-extension = "0.5.0"
 url = "1.2.0"
 
 [dependencies.gtk]
-version = "0.3.0"
+version = "0.8.1"
 features = ["v3_18"]
 
 [dependencies.gtk-sys]
-version = "0.5.0"
+version = "0.9.2"
 features = ["v3_18"]
 
