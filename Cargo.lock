@@ -422,7 +422,7 @@ dependencies = [
 
 [[package]]
 name = "tmsu-nautilus"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "gdk 0.12.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "glib 0.9.3 (registry+https://github.com/rust-lang/crates.io-index)",

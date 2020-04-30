@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.4 (2020-04-30)
+
+* Updated nautilus-extension to 0.5.0.
+* Updated gtk-rs dependencies.
+
 ## 0.5.3 (2019-04-18)
 
 * Updated nautilus-extension to 0.4.0.
