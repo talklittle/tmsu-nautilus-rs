@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.5 (2021-08-27)
+
+* Automate GitHub release using GitHub Actions.
+
 ## 0.5.4 (2020-04-30)
 
 * Updated nautilus-extension to 0.5.0.
