@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0 (2022-07-26)
+
+* Updated nautilus-extension to 0.7.0.
+* Updated gtk-rs and related dependencies to 0.15.
+* Require GTK+ 3.20 and Rust 1.57.
+
 ## 0.5.5 (2021-08-27)
 
 * Automate GitHub release using GitHub Actions.
