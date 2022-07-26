@@ -3,8 +3,8 @@
 use gtk;
 use gtk::prelude::*;
 use nautilus_extension::FileInfo;
+use percent_encoding;
 use tmsu_commands;
-use url;
 
 pub fn new_widget(files: &Vec<FileInfo>) -> gtk::Widget {
     let frame = gtk::Frame::new(None);
@@ -78,7 +78,7 @@ fn list_box_row(tag: &str, file: &FileInfo) -> gtk::ListBoxRow {
 
 fn get_path(file_info: &FileInfo) -> String {
     let uri = file_info.get_uri();
-    url::percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned()
+    percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned()
 }
 
 fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {

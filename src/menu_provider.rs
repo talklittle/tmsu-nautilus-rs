@@ -6,9 +6,9 @@ use gtk::prelude::*;
 use gtk_ffi::GtkWidget;
 use gtk_helpers;
 use nautilus_extension::{FileInfo, Menu, MenuItem, MenuProvider};
+use percent_encoding;
 use tags_list;
 use tmsu_commands;
-use url;
 
 pub struct TmsuMenuProvider {
 
@@ -117,7 +117,7 @@ fn filenames(files: &Vec<FileInfo>) -> Vec<String> {
         }
 
         let uri = file_info.get_uri();
-        let path = url::percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned();
+        let path = percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned();
         filenames.push(path);
     }
     filenames

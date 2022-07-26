@@ -9,7 +9,7 @@ extern crate gtk_sys as gtk_ffi;
 extern crate libc;
 #[macro_use(nautilus_module, nautilus_menu_item_activate_cb)]
 extern crate nautilus_extension;
-extern crate url;
+extern crate percent_encoding;
 
 pub mod column_provider;
 mod gtk_helpers;
