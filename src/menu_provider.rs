@@ -97,10 +97,10 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
 }
 
 fn add_tags(entry: &gtk::Entry, file_infos: &Vec<FileInfo>, window: &gtk::Window) {
-    let entry_text = entry.get_text().unwrap();
+    let entry_text = entry.text();
     let filenames = filenames(file_infos);
 
-    let tags = entry_text.split_whitespace().map(String::from).collect();
+    let tags = entry_text.as_str().split_whitespace().map(String::from).collect();
     tmsu_commands::add_tags(&filenames, &tags);
 
     window.close();

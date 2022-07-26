@@ -1,6 +1,7 @@
 // GTK List Box widget
 
 use gtk;
+use gtk::builders::ScrolledWindowBuilder;
 use gtk::prelude::*;
 use nautilus_extension::FileInfo;
 use percent_encoding;
@@ -9,7 +10,7 @@ use tmsu_commands;
 pub fn new_widget(files: &Vec<FileInfo>) -> gtk::Widget {
     let frame = gtk::Frame::new(None);
 
-    let scrolled_window = gtk::ScrolledWindowBuilder::new().build();
+    let scrolled_window = ScrolledWindowBuilder::new().build();
     scrolled_window.set_policy(gtk::PolicyType::Automatic, gtk::PolicyType::Always);
     frame.add(&scrolled_window);
 
@@ -82,22 +83,22 @@ fn get_path(file_info: &FileInfo) -> String {
 }
 
 fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {
-    let hbox = button.get_parent().unwrap();
-    let list_box_row = hbox.get_parent().unwrap();
-    let mut list_box = list_box_row.get_parent().unwrap().downcast::<gtk::ListBox>().unwrap();
+    let hbox = button.parent().unwrap();
+    let list_box_row = hbox.parent().unwrap();
+    let mut list_box = list_box_row.parent().unwrap().downcast::<gtk::ListBox>().unwrap();
 
-    let tag_and_file_count_vbox = hbox.downcast::<gtk::Container>().unwrap().get_children()[0].clone();
+    let tag_and_file_count_vbox = hbox.downcast::<gtk::Container>().unwrap().children()[0].clone();
 
-    let tag_label = tag_and_file_count_vbox.downcast::<gtk::Container>().unwrap().get_children()[0].clone();
-    let tag = tag_label.downcast::<gtk::Label>().unwrap().get_text().unwrap();
+    let tag_label = tag_and_file_count_vbox.downcast::<gtk::Container>().unwrap().children()[0].clone();
+    let tag = tag_label.downcast::<gtk::Label>().unwrap().text();
 
     let path = get_path(&file);
-    tmsu_commands::untag(&path, &tag);
+    tmsu_commands::untag(&path, tag.as_str());
     file.invalidate_extension_info();
 
     // remove all and repopulate list
 
-    for row in list_box.get_children() {
+    for row in list_box.children() {
         list_box.remove(&row);
     }
 
@@ -106,16 +107,16 @@ fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {
 }
 
 fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow, files: &Vec<FileInfo>) {
-    let hbox = list_box_row.get_children()[0].clone().downcast::<gtk::Box>().unwrap();
-    let tag_and_file_count_vbox = hbox.get_children()[0].clone().downcast::<gtk::Box>().unwrap();
+    let hbox = list_box_row.children()[0].clone().downcast::<gtk::Box>().unwrap();
+    let tag_and_file_count_vbox = hbox.children()[0].clone().downcast::<gtk::Box>().unwrap();
 
-    let tag_label = tag_and_file_count_vbox.get_children()[0].clone().downcast::<gtk::Label>().unwrap();
-    let entry = tag_and_file_count_vbox.get_children()[1].clone().downcast::<gtk::Entry>().unwrap();
+    let tag_label = tag_and_file_count_vbox.children()[0].clone().downcast::<gtk::Label>().unwrap();
+    let entry = tag_and_file_count_vbox.children()[1].clone().downcast::<gtk::Entry>().unwrap();
 
     tag_label.hide();
     entry.show();
 
-    entry.set_text(&tag_label.get_text().unwrap());
+    entry.set_text(&tag_label.text().as_str());
 
     let tag_label_clone = tag_label.clone();
     entry.connect_focus_out_event(move |entry, _| {
@@ -131,17 +132,17 @@ fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow, fi
     entry.connect_activate(move |entry| {
         // untag old and tag new
 
-        let old_tag = tag_label_clone.get_text().unwrap();
-        let new_tags = entry.get_text().unwrap().split_whitespace().map(String::from).collect();
+        let old_tag = tag_label_clone.text();
+        let new_tags = entry.text().as_str().split_whitespace().map(String::from).collect();
 
         for ref file in &files_clone {
             let path = get_path(&file);
-            tmsu_commands::untag(&path, &old_tag);
+            tmsu_commands::untag(&path, old_tag.as_str());
             tmsu_commands::add_tags(&vec![path], &new_tags);
             file.invalidate_extension_info();
         }
 
-        tag_label_clone.set_text(&entry.get_text().unwrap());
+        tag_label_clone.set_text(&entry.text().as_str());
 
         entry.hide();
         tag_label_clone.show();
