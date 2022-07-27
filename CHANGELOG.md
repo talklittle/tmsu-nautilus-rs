@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1 (2022-07-27)
+
+* Updated nautilus-extension to 0.8.0.
+* Fixed Clippy lint warnings.
+
 ## 0.6.0 (2022-07-26)
 
 * Updated nautilus-extension to 0.7.0.
