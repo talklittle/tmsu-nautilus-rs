@@ -133,12 +133,12 @@ fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow, fi
         // untag old and tag new
 
         let old_tag = tag_label_clone.text();
-        let new_tags = entry.text().as_str().split_whitespace().map(String::from).collect();
+        let new_tags: Vec<String> = entry.text().as_str().split_whitespace().map(String::from).collect();
 
         for file in &files_clone {
             let path = get_path(file);
             tmsu_commands::untag(&path, old_tag.as_str());
-            tmsu_commands::add_tags(&vec![path], &new_tags);
+            tmsu_commands::add_tags(&[path], &new_tags);
             file.invalidate_extension_info();
         }
 

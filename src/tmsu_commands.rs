@@ -1,3 +1,4 @@
+use std::ffi::OsStr;
 use std::path::Path;
 use std::process::Command;
 
@@ -21,11 +22,11 @@ pub fn tags(path: &str) -> Vec<String> {
     }
 }
 
-pub fn add_tags(filenames: &Vec<String>, tags: &Vec<String>) {
+pub fn add_tags<S: AsRef<OsStr>, T: AsRef<str>>(filenames: &[S], tags: &[T]) {
     for tag in tags {
         Command::new("tmsu")
                 .arg("tag")
-                .arg(format!("--tags=\"{}\"", tag))
+                .arg(format!("--tags=\"{}\"", tag.as_ref()))
                 .args(filenames)
                 .current_dir(Path::new(&filenames[0]).parent().unwrap())
                 .output()

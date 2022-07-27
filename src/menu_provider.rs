@@ -94,17 +94,17 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
     gtk::main();
 }
 
-fn add_tags(entry: &gtk::Entry, file_infos: &Vec<FileInfo>, window: &gtk::Window) {
+fn add_tags(entry: &gtk::Entry, file_infos: &[FileInfo], window: &gtk::Window) {
     let entry_text = entry.text();
     let filenames = filenames(file_infos);
 
-    let tags = entry_text.as_str().split_whitespace().map(String::from).collect();
+    let tags: Vec<String> = entry_text.as_str().split_whitespace().map(String::from).collect();
     tmsu_commands::add_tags(&filenames, &tags);
 
     window.close();
 }
 
-fn filenames(files: &Vec<FileInfo>) -> Vec<String> {
+fn filenames(files: &[FileInfo]) -> Vec<String> {
     let mut filenames = Vec::new();
     let length = files.len();
     for file_info in files.iter().take(length) {
@@ -120,7 +120,7 @@ fn filenames(files: &Vec<FileInfo>) -> Vec<String> {
     filenames
 }
 
-fn invalidate_file_infos(files: &Vec<FileInfo>) {
+fn invalidate_file_infos(files: &[FileInfo]) {
     let length = files.len();
     for file_info in files.iter().take(length) {
         file_info.invalidate_extension_info();
