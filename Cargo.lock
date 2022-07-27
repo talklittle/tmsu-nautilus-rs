@@ -367,9 +367,9 @@ dependencies = [
 
 [[package]]
 name = "nautilus-extension"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "514fdc01a4f45c4635bf404de071d1ef32a1605249035f51bf7e4968165fe753"
+checksum = "8edb455c79ac5972e0e55c3912ef989b2b417b39ce5e12baf0c4a58d87ff561c"
 dependencies = [
  "gio-sys",
  "glib-sys",
@@ -382,9 +382,9 @@ dependencies = [
 
 [[package]]
 name = "nautilus-extension-sys"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86c7d0ac41bd06395895bdb52012d8de08839e53e01fa3b4dcf8ad91f2a7d947"
+checksum = "71ac2bcf4b4330cd277b7e0c6f1f1991b233b9b89e59986f31d2beb111f63a51"
 dependencies = [
  "gio-sys",
  "glib-sys",

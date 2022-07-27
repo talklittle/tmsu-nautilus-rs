@@ -7,7 +7,7 @@ use nautilus_extension::FileInfo;
 use percent_encoding;
 use tmsu_commands;
 
-pub fn new_widget(files: &Vec<FileInfo>) -> gtk::Widget {
+pub fn new_widget(files: &[FileInfo]) -> gtk::Widget {
     let frame = gtk::Frame::new(None);
 
     let scrolled_window = ScrolledWindowBuilder::new().build();
@@ -19,7 +19,7 @@ pub fn new_widget(files: &Vec<FileInfo>) -> gtk::Widget {
         add_tag_rows_from_file(&mut list_box, &file);
     }
 
-    let files_clone = files.clone();
+    let files_clone = files.to_owned();
     list_box.connect_row_activated(move |list_box, list_box_row| {
         on_row_activated(list_box, list_box_row, &files_clone);
     });

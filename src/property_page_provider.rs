@@ -10,7 +10,7 @@ pub struct TmsuPropertyPageProvider {
 }
 
 impl PropertyPageProvider for TmsuPropertyPageProvider {
-    fn get_pages(&self, files: &Vec<FileInfo>) -> Vec<PropertyPage> {
+    fn get_pages(&self, files: &[FileInfo]) -> Vec<PropertyPage> {
         // TODO Edit tags for multiple selected files
         if files.len() != 1 {
             return Vec::new();

@@ -15,7 +15,7 @@ pub struct TmsuMenuProvider {
 }
 
 impl MenuProvider for TmsuMenuProvider {
-    fn get_file_items(&self, _window: *mut GtkWidget, files: &Vec<FileInfo>) -> Vec<MenuItem> {
+    fn get_file_items(&self, _window: *mut GtkWidget, files: &[FileInfo]) -> Vec<MenuItem> {
         let mut top_menuitem = MenuItem::new(
             "TmsuNautilusExtension::TMSU", "TMSU", "TMSU tags", None
         );
