@@ -106,8 +106,7 @@ fn add_tags(entry: &gtk::Entry, file_infos: &[FileInfo], window: &gtk::Window) {
 
 fn filenames(files: &[FileInfo]) -> Vec<String> {
     let mut filenames = Vec::new();
-    let length = files.len();
-    for file_info in files.iter().take(length) {
+    for file_info in files {
         let uri_scheme = file_info.get_uri_scheme();
         if uri_scheme != "file" {
             continue;
@@ -121,8 +120,7 @@ fn filenames(files: &[FileInfo]) -> Vec<String> {
 }
 
 fn invalidate_file_infos(files: &[FileInfo]) {
-    let length = files.len();
-    for file_info in files.iter().take(length) {
+    for file_info in files {
         file_info.invalidate_extension_info();
     }
 }
