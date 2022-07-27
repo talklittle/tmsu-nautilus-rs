@@ -16,7 +16,7 @@ pub fn new_widget(files: &[FileInfo]) -> gtk::Widget {
 
     let mut list_box = gtk::ListBox::new();
     for file in files {
-        add_tag_rows_from_file(&mut list_box, &file);
+        add_tag_rows_from_file(&mut list_box, file);
     }
 
     let files_clone = files.to_owned();
@@ -37,11 +37,11 @@ fn add_tag_rows_from_file(list_box: &mut gtk::ListBox, file: &FileInfo) {
     let tags =
         match file.attributes.get("tmsu_tags") {
             Some(value) => value.split_whitespace().map(|s| s.to_owned()).collect(),
-            None => tmsu_commands::tags(&get_path(&file)),
+            None => tmsu_commands::tags(&get_path(file)),
         };
 
     for tag in tags {
-        let row = list_box_row(&tag, &file);
+        let row = list_box_row(&tag, file);
         list_box.add(&row);
     }
 }
@@ -68,7 +68,7 @@ fn list_box_row(tag: &str, file: &FileInfo) -> gtk::ListBoxRow {
 
     let file_clone = file.clone();
     remove_button.connect_clicked(move |remove_button| {
-        on_clicked_remove_cb(&remove_button, &file_clone);
+        on_clicked_remove_cb(remove_button, &file_clone);
     });
 
     list_box_row.show_all();
@@ -79,7 +79,7 @@ fn list_box_row(tag: &str, file: &FileInfo) -> gtk::ListBoxRow {
 
 fn get_path(file_info: &FileInfo) -> String {
     let uri = file_info.get_uri();
-    percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned()
+    percent_encoding::percent_decode(uri[7..].as_ref()).decode_utf8_lossy().into_owned()
 }
 
 fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {
@@ -92,7 +92,7 @@ fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {
     let tag_label = tag_and_file_count_vbox.downcast::<gtk::Container>().unwrap().children()[0].clone();
     let tag = tag_label.downcast::<gtk::Label>().unwrap().text();
 
-    let path = get_path(&file);
+    let path = get_path(file);
     tmsu_commands::untag(&path, tag.as_str());
     file.invalidate_extension_info();
 
@@ -102,11 +102,11 @@ fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {
         list_box.remove(&row);
     }
 
-    add_tag_rows_from_file(&mut list_box, &file);
+    add_tag_rows_from_file(&mut list_box, file);
     list_box.show();
 }
 
-fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow, files: &Vec<FileInfo>) {
+fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow, files: &[FileInfo]) {
     let hbox = list_box_row.children()[0].clone().downcast::<gtk::Box>().unwrap();
     let tag_and_file_count_vbox = hbox.children()[0].clone().downcast::<gtk::Box>().unwrap();
 
@@ -116,7 +116,7 @@ fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow, fi
     tag_label.hide();
     entry.show();
 
-    entry.set_text(&tag_label.text().as_str());
+    entry.set_text(tag_label.text().as_str());
 
     let tag_label_clone = tag_label.clone();
     entry.connect_focus_out_event(move |entry, _| {
@@ -127,22 +127,22 @@ fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow, fi
     });
     entry.grab_focus();
 
-    let tag_label_clone = tag_label.clone();
-    let files_clone = files.clone();
+    let tag_label_clone = tag_label;
+    let files_clone = files.to_owned();
     entry.connect_activate(move |entry| {
         // untag old and tag new
 
         let old_tag = tag_label_clone.text();
         let new_tags = entry.text().as_str().split_whitespace().map(String::from).collect();
 
-        for ref file in &files_clone {
-            let path = get_path(&file);
+        for file in &files_clone {
+            let path = get_path(file);
             tmsu_commands::untag(&path, old_tag.as_str());
             tmsu_commands::add_tags(&vec![path], &new_tags);
             file.invalidate_extension_info();
         }
 
-        tag_label_clone.set_text(&entry.text().as_str());
+        tag_label_clone.set_text(entry.text().as_str());
 
         entry.hide();
         tag_label_clone.show();

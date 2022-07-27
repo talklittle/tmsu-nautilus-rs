@@ -22,5 +22,5 @@ impl InfoProvider for TmsuInfoProvider {
 
 fn get_path(file_info: &FileInfo) -> String {
     let uri = file_info.get_uri();
-    percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned()
+    percent_encoding::percent_decode(uri[7..].as_ref()).decode_utf8_lossy().into_owned()
 }

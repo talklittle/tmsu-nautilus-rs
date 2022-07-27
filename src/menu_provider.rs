@@ -78,16 +78,14 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
         add_tags(entry_ref, &files_clone, &window_clone);
     });
 
-    let entry_clone = entry.clone();
     let files_clone = files.clone();
     let window_clone = window.clone();
     button.connect_clicked(move |_| {
-        add_tags(&entry_clone, &files_clone, &window_clone);
+        add_tags(&entry, &files_clone, &window_clone);
     });
 
-    let files_clone = files.clone();
     window.connect_delete_event(move |_, _| {
-        invalidate_file_infos(&files_clone);
+        invalidate_file_infos(&files);
         gtk::main_quit();
         Inhibit(false)
     });
@@ -109,15 +107,14 @@ fn add_tags(entry: &gtk::Entry, file_infos: &Vec<FileInfo>, window: &gtk::Window
 fn filenames(files: &Vec<FileInfo>) -> Vec<String> {
     let mut filenames = Vec::new();
     let length = files.len();
-    for i in 0..length {
-        let file_info = &files[i];
+    for file_info in files.iter().take(length) {
         let uri_scheme = file_info.get_uri_scheme();
         if uri_scheme != "file" {
             continue;
         }
 
         let uri = file_info.get_uri();
-        let path = percent_encoding::percent_decode(&uri[7..].as_ref()).decode_utf8_lossy().into_owned();
+        let path = percent_encoding::percent_decode(uri[7..].as_ref()).decode_utf8_lossy().into_owned();
         filenames.push(path);
     }
     filenames
@@ -125,8 +122,7 @@ fn filenames(files: &Vec<FileInfo>) -> Vec<String> {
 
 fn invalidate_file_infos(files: &Vec<FileInfo>) {
     let length = files.len();
-    for i in 0..length {
-        let file_info = &files[i];
+    for file_info in files.iter().take(length) {
         file_info.invalidate_extension_info();
     }
 }
@@ -144,9 +140,8 @@ fn show_edit_tags_window(files: Vec<FileInfo>) {
 
     window.add(&tags_list);
 
-    let files_clone = files.clone();
     window.connect_delete_event(move |_, _| {
-        invalidate_file_infos(&files_clone);
+        invalidate_file_infos(&files);
         gtk::main_quit();
         Inhibit(false)
     });
