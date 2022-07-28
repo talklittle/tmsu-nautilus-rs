@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.2 (2022-07-27)
+
+* Fixed tags edit dialog invalidation bug causing temporary "unknown" text in TMSU tags column.
+
 ## 0.6.1 (2022-07-27)
 
 * Updated nautilus-extension to 0.8.0.
