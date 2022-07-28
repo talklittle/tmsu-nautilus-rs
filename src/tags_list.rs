@@ -19,9 +19,8 @@ pub fn new_widget(files: &[FileInfo]) -> gtk::Widget {
         add_tag_rows_from_file(&mut list_box, file);
     }
 
-    let files_clone = files.to_owned();
     list_box.connect_row_activated(move |list_box, list_box_row| {
-        on_row_activated(list_box, list_box_row, &files_clone);
+        on_row_activated(list_box, list_box_row);
     });
     list_box.show();
 
@@ -61,6 +60,33 @@ fn list_box_row(tag: &str, file: &FileInfo) -> gtk::ListBoxRow {
 
     let entry = gtk::Entry::new();
     tag_and_file_count_vbox.pack_start(&entry, true, true, 0);
+
+    let tag_label_clone = tag_label.clone();
+    entry.connect_focus_out_event(move |entry, _| {
+        // user clicked away; ignore changes
+        entry.hide();
+        tag_label_clone.show();
+        Inhibit(false)
+    });
+
+    let tag_label_clone = tag_label;
+    let file_clone = file.clone();
+    entry.connect_activate(move |entry| {
+        // untag old and tag new
+
+        let old_tag = tag_label_clone.text();
+        let new_tags: Vec<String> = entry.text().as_str().split_whitespace().map(String::from).collect();
+
+        let path = get_path(&file_clone);
+        tmsu_commands::untag(&path, old_tag.as_str());
+        tmsu_commands::add_tags(&[path], &new_tags);
+        file_clone.invalidate_extension_info();
+
+        tag_label_clone.set_text(entry.text().as_str());
+
+        entry.hide();
+        tag_label_clone.show();
+    });
 
     let remove_button = gtk::Button::new();
     remove_button.set_label("Remove");
@@ -106,7 +132,7 @@ fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {
     list_box.show();
 }
 
-fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow, files: &[FileInfo]) {
+fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow) {
     let hbox = list_box_row.children()[0].clone().downcast::<gtk::Box>().unwrap();
     let tag_and_file_count_vbox = hbox.children()[0].clone().downcast::<gtk::Box>().unwrap();
 
@@ -117,34 +143,5 @@ fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow, fi
     entry.show();
 
     entry.set_text(tag_label.text().as_str());
-
-    let tag_label_clone = tag_label.clone();
-    entry.connect_focus_out_event(move |entry, _| {
-        // user clicked away; ignore changes
-        entry.hide();
-        tag_label_clone.show();
-        Inhibit(false)
-    });
     entry.grab_focus();
-
-    let tag_label_clone = tag_label;
-    let files_clone = files.to_owned();
-    entry.connect_activate(move |entry| {
-        // untag old and tag new
-
-        let old_tag = tag_label_clone.text();
-        let new_tags: Vec<String> = entry.text().as_str().split_whitespace().map(String::from).collect();
-
-        for file in &files_clone {
-            let path = get_path(file);
-            tmsu_commands::untag(&path, old_tag.as_str());
-            tmsu_commands::add_tags(&[path], &new_tags);
-            file.invalidate_extension_info();
-        }
-
-        tag_label_clone.set_text(entry.text().as_str());
-
-        entry.hide();
-        tag_label_clone.show();
-    });
 }
