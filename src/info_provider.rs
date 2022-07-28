@@ -1,6 +1,6 @@
 use nautilus_extension::{FileInfo, InfoProvider};
 use percent_encoding;
-use tmsu_commands;
+use crate::tmsu_commands;
 
 pub struct TmsuInfoProvider {
 

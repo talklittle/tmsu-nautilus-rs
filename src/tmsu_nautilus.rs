@@ -1,12 +1,12 @@
-use glib_ffi::GType;
-use gobject_ffi::GTypeModule;
+use crate::glib_ffi::GType;
+use crate::gobject_ffi::GTypeModule;
 use libc::c_int;
 use nautilus_extension::NautilusModule;
 
-use column_provider;
-use info_provider;
-use menu_provider;
-use property_page_provider;
+use crate::column_provider;
+use crate::info_provider;
+use crate::menu_provider;
+use crate::property_page_provider;
 
 nautilus_module!(init);
 

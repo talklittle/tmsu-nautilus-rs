@@ -1,5 +1,4 @@
-use gtk;
-use gtk_ffi::gtk_init;
+use crate::gtk_ffi::gtk_init;
 use std::ptr;
 
 // workaround for https://github.com/gtk-rs/gtk/issues/405

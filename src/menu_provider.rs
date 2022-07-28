@@ -1,14 +1,14 @@
 use gdk;
-use glib_ffi::gpointer;
-use gobject_ffi::GObject;
+use crate::glib_ffi::gpointer;
+use crate::gobject_ffi::GObject;
 use gtk;
 use gtk::prelude::*;
-use gtk_ffi::GtkWidget;
-use gtk_helpers;
+use crate::gtk_ffi::GtkWidget;
+use crate::gtk_helpers;
 use nautilus_extension::{FileInfo, Menu, MenuItem, MenuProvider};
 use percent_encoding;
-use tags_list;
-use tmsu_commands;
+use crate::tags_list;
+use crate::tmsu_commands;
 
 pub struct TmsuMenuProvider {
 

@@ -5,7 +5,7 @@ use gtk::builders::ScrolledWindowBuilder;
 use gtk::prelude::*;
 use nautilus_extension::FileInfo;
 use percent_encoding;
-use tmsu_commands;
+use crate::tmsu_commands;
 
 pub fn new_widget(files: &[FileInfo]) -> gtk::Widget {
     let frame = gtk::Frame::new(None);

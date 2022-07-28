@@ -1,9 +1,9 @@
 use glib::translate::*;
 use gtk;
 use gtk::prelude::*;
-use gtk_helpers;
+use crate::gtk_helpers;
 use nautilus_extension::{FileInfo, PropertyPage, PropertyPageProvider};
-use tags_list;
+use crate::tags_list;
 
 pub struct TmsuPropertyPageProvider {
 
