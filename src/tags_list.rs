@@ -1,11 +1,11 @@
 // GTK List Box widget
 
+use crate::tmsu_commands;
 use gtk;
 use gtk::builders::ScrolledWindowBuilder;
 use gtk::prelude::*;
 use nautilus_extension::FileInfo;
 use percent_encoding;
-use crate::tmsu_commands;
 
 pub fn new_widget(files: &[FileInfo]) -> gtk::Widget {
     let frame = gtk::Frame::new(None);
@@ -33,11 +33,10 @@ pub fn new_widget(files: &[FileInfo]) -> gtk::Widget {
 }
 
 fn add_tag_rows_from_file(list_box: &mut gtk::ListBox, file: &FileInfo) {
-    let tags =
-        match file.attributes.get("tmsu_tags") {
-            Some(value) => value.split_whitespace().map(|s| s.to_owned()).collect(),
-            None => tmsu_commands::tags(&get_path(file)),
-        };
+    let tags = match file.attributes.get("tmsu_tags") {
+        Some(value) => value.split_whitespace().map(|s| s.to_owned()).collect(),
+        None => tmsu_commands::tags(&get_path(file)),
+    };
 
     for tag in tags {
         let row = list_box_row(&tag, file);
@@ -75,7 +74,12 @@ fn list_box_row(tag: &str, file: &FileInfo) -> gtk::ListBoxRow {
         // untag old and tag new
 
         let old_tag = tag_label_clone.text();
-        let new_tags: Vec<String> = entry.text().as_str().split_whitespace().map(String::from).collect();
+        let new_tags: Vec<String> = entry
+            .text()
+            .as_str()
+            .split_whitespace()
+            .map(String::from)
+            .collect();
 
         let path = get_path(&file_clone);
         tmsu_commands::untag(&path, old_tag.as_str());
@@ -105,17 +109,27 @@ fn list_box_row(tag: &str, file: &FileInfo) -> gtk::ListBoxRow {
 
 fn get_path(file_info: &FileInfo) -> String {
     let uri = file_info.get_uri();
-    percent_encoding::percent_decode(uri[7..].as_ref()).decode_utf8_lossy().into_owned()
+    percent_encoding::percent_decode(uri[7..].as_ref())
+        .decode_utf8_lossy()
+        .into_owned()
 }
 
 fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {
     let hbox = button.parent().unwrap();
     let list_box_row = hbox.parent().unwrap();
-    let mut list_box = list_box_row.parent().unwrap().downcast::<gtk::ListBox>().unwrap();
+    let mut list_box = list_box_row
+        .parent()
+        .unwrap()
+        .downcast::<gtk::ListBox>()
+        .unwrap();
 
     let tag_and_file_count_vbox = hbox.downcast::<gtk::Container>().unwrap().children()[0].clone();
 
-    let tag_label = tag_and_file_count_vbox.downcast::<gtk::Container>().unwrap().children()[0].clone();
+    let tag_label = tag_and_file_count_vbox
+        .downcast::<gtk::Container>()
+        .unwrap()
+        .children()[0]
+        .clone();
     let tag = tag_label.downcast::<gtk::Label>().unwrap().text();
 
     let path = get_path(file);
@@ -133,11 +147,20 @@ fn on_clicked_remove_cb(button: &gtk::Button, file: &FileInfo) {
 }
 
 fn on_row_activated(_list_box: &gtk::ListBox, list_box_row: &gtk::ListBoxRow) {
-    let hbox = list_box_row.children()[0].clone().downcast::<gtk::Box>().unwrap();
+    let hbox = list_box_row.children()[0]
+        .clone()
+        .downcast::<gtk::Box>()
+        .unwrap();
     let tag_and_file_count_vbox = hbox.children()[0].clone().downcast::<gtk::Box>().unwrap();
 
-    let tag_label = tag_and_file_count_vbox.children()[0].clone().downcast::<gtk::Label>().unwrap();
-    let entry = tag_and_file_count_vbox.children()[1].clone().downcast::<gtk::Entry>().unwrap();
+    let tag_label = tag_and_file_count_vbox.children()[0]
+        .clone()
+        .downcast::<gtk::Label>()
+        .unwrap();
+    let entry = tag_and_file_count_vbox.children()[1]
+        .clone()
+        .downcast::<gtk::Entry>()
+        .unwrap();
 
     tag_label.hide();
     entry.show();

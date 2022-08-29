@@ -1,13 +1,11 @@
+use crate::gtk_helpers;
+use crate::tags_list;
 use glib::translate::*;
 use gtk;
 use gtk::prelude::*;
-use crate::gtk_helpers;
 use nautilus_extension::{FileInfo, PropertyPage, PropertyPageProvider};
-use crate::tags_list;
 
-pub struct TmsuPropertyPageProvider {
-
-}
+pub struct TmsuPropertyPageProvider {}
 
 impl PropertyPageProvider for TmsuPropertyPageProvider {
     fn get_pages(&self, files: &[FileInfo]) -> Vec<PropertyPage> {
@@ -30,8 +28,10 @@ impl PropertyPageProvider for TmsuPropertyPageProvider {
 
         list.show();
 
-        vec![
-            PropertyPage::new("TMSU tags", label.upcast::<gtk::Widget>().to_glib_full(), list.to_glib_full())
-        ]
+        vec![PropertyPage::new(
+            "TMSU tags",
+            label.upcast::<gtk::Widget>().to_glib_full(),
+            list.to_glib_full(),
+        )]
     }
 }

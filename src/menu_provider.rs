@@ -1,29 +1,29 @@
-use gdk;
 use crate::glib_ffi::gpointer;
 use crate::gobject_ffi::GObject;
-use gtk;
-use gtk::prelude::*;
 use crate::gtk_ffi::GtkWidget;
 use crate::gtk_helpers;
-use nautilus_extension::{FileInfo, Menu, MenuItem, MenuProvider};
-use percent_encoding;
 use crate::tags_list;
 use crate::tmsu_commands;
+use gdk;
+use gtk;
+use gtk::prelude::*;
+use nautilus_extension::{FileInfo, Menu, MenuItem, MenuProvider};
+use percent_encoding;
 
-pub struct TmsuMenuProvider {
-
-}
+pub struct TmsuMenuProvider {}
 
 impl MenuProvider for TmsuMenuProvider {
     fn get_file_items(&self, _window: *mut GtkWidget, files: &[FileInfo]) -> Vec<MenuItem> {
-        let mut top_menuitem = MenuItem::new(
-            "TmsuNautilusExtension::TMSU", "TMSU", "TMSU tags", None
-        );
+        let mut top_menuitem =
+            MenuItem::new("TmsuNautilusExtension::TMSU", "TMSU", "TMSU tags", None);
 
         let mut sub_items: Vec<MenuItem> = Vec::new();
 
         let mut add_tag_menuitem = MenuItem::new(
-            "TmsuNautilusExtension::Add_Tag", "Add tags\u{2026}", "Add tags\u{2026}", None
+            "TmsuNautilusExtension::Add_Tag",
+            "Add tags\u{2026}",
+            "Add tags\u{2026}",
+            None,
         );
         add_tag_menuitem.set_activate_cb(add_tag_activate_cb);
         sub_items.push(add_tag_menuitem);
@@ -31,7 +31,10 @@ impl MenuProvider for TmsuMenuProvider {
         // TODO Edit multiple selected files
         if files.len() == 1 {
             let mut edit_tags_menuitem = MenuItem::new(
-                "TmsuNautilusExtension::Edit_Tags", "Edit tags\u{2026}", "Edit tags\u{2026}", None
+                "TmsuNautilusExtension::Edit_Tags",
+                "Edit tags\u{2026}",
+                "Edit tags\u{2026}",
+                None,
             );
             edit_tags_menuitem.set_activate_cb(edit_tags_activate_cb);
             sub_items.push(edit_tags_menuitem);
@@ -61,7 +64,11 @@ fn show_add_tag_window(files: Vec<FileInfo>) {
     window.add(&vbox);
 
     let files_count = files.len();
-    let prompt_text = format!("Add (space-separated) tags to {} file{}", files_count, if files_count == 1 { "" } else { "s" });
+    let prompt_text = format!(
+        "Add (space-separated) tags to {} file{}",
+        files_count,
+        if files_count == 1 { "" } else { "s" }
+    );
     let prompt_label = gtk::Label::new(Some(&*prompt_text));
     vbox.pack_start(&prompt_label, true, true, 0);
 
@@ -98,7 +105,11 @@ fn add_tags(entry: &gtk::Entry, file_infos: &[FileInfo], window: &gtk::Window) {
     let entry_text = entry.text();
     let filenames = filenames(file_infos);
 
-    let tags: Vec<String> = entry_text.as_str().split_whitespace().map(String::from).collect();
+    let tags: Vec<String> = entry_text
+        .as_str()
+        .split_whitespace()
+        .map(String::from)
+        .collect();
     tmsu_commands::add_tags(&filenames, &tags);
 
     window.close();
@@ -113,7 +124,9 @@ fn filenames(files: &[FileInfo]) -> Vec<String> {
         }
 
         let uri = file_info.get_uri();
-        let path = percent_encoding::percent_decode(uri[7..].as_ref()).decode_utf8_lossy().into_owned();
+        let path = percent_encoding::percent_decode(uri[7..].as_ref())
+            .decode_utf8_lossy()
+            .into_owned();
         filenames.push(path);
     }
     filenames
