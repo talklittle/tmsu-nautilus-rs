@@ -15,6 +15,13 @@ GNOME Nautilus extension for file tagging using [TMSU](https://github.com/oniony
 
 Download the latest release from [Releases](https://github.com/talklittle/tmsu-nautilus-rs/releases).
 
+If your installation is successful, you will see this Nautilus logs when running from the terminal.
+
+```shell
+$ nautilus
+Initializing TMSU Nautilus 0.6.2
+```
+
 **From .deb (Ubuntu/Debian):**
 
     sudo dpkg -i tmsu-nautilus_${VERSION}_${ARCH}.deb
@@ -24,7 +31,14 @@ Download the latest release from [Releases](https://github.com/talklittle/tmsu-n
 
 **Alternatively, copy .so manually:**
 
+    # Debian
     sudo cp libtmsu-nautilus.so /usr/lib/nautilus/extensions-3.0/libtmsu-nautilus.so
+    # Fedora
+    sudo cp libtmsu-nautilus.so /usr/lib64/nautilus/extensions-3.0/libtmsu-nautilus.so
+
+    # Make sure the extension has the correct permission
+    sudo chmod u=rwxr,g=xr,o=x libtmsu-nautilus.so
+    sudo chmod g+x libtmsu-nautilus.so
 
     # Kill and restart Nautilus:
     nautilus -q
